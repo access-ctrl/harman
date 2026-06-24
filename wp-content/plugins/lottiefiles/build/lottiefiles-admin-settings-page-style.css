@@ -1,0 +1,213 @@
+@font-face{
+  font-family:"averta_stdregular";
+
+  font-weight:normal;
+
+  src:url(https://static2.lottiefiles.com/fonts/avertastd-regular-webfont.woff2) format("woff2");
+
+  font-style:normal;
+
+  font-display:auto
+}
+
+@font-face{
+  font-family:"averta_stdbold";
+
+  src:url(https://static2.lottiefiles.com/fonts/avertastd-bold-webfont.woff2) format("woff2");
+
+  font-weight:bold;
+
+  font-style:normal;
+
+  font-display:auto
+}
+
+@font-face{
+  font-family:"averta_stdsemibold";
+
+  src:url(https://static2.lottiefiles.com/fonts/avertastd-semibold-webfont.woff2) format("woff2");
+
+  font-weight:normal;
+
+  font-style:normal;
+
+  font-display:auto
+}
+
+@font-face{
+  font-family:"averta_stdextrabold";
+
+  src:url(https://static2.lottiefiles.com/fonts/avertastd-extrabold-webfont.woff2) format("woff2");
+
+  font-weight:normal;
+
+  font-style:normal;
+
+  font-display:auto
+}
+
+#wpwrap{
+  height:100%
+}
+
+#wpwrap div#wpcontent{
+  height:100%
+}
+
+#wpwrap div#wpcontent div#wpbody{
+  height:100%
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content{
+  height:100%
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings{
+  font-family:"averta_stdregular",sans-serif;
+  height:100%;
+  display:-ms-flexbox;
+  display:flex;
+  -ms-flex-direction:column;
+      flex-direction:column;
+  -ms-flex-pack:justify;
+      justify-content:space-between;
+  margin-left:-36px
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .font-bold{
+  font-family:"averta_stdbold",sans-serif;
+  font-weight:bold
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings div.header div.version{
+  -ms-flex-pack:end;
+      justify-content:flex-end;
+  -ms-flex-align:center;
+      align-items:center
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings div.header div.version span{
+  margin-right:10px;
+  color:#8795a1;
+  font-size:13px
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .p-36{
+  padding:36px
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form{
+  background-color:#fff;
+  padding:50px;
+  margin:36px;
+  -ms-flex-positive:1;
+      flex-grow:1;
+  border-radius:8px
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form h1{
+  font-family:"averta_stdbold",sans-serif;
+  font-size:28px;
+  line-height:40px;
+  margin:0
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form p{
+  font-style:normal;
+  font-weight:600;
+  font-size:20px;
+  margin:revert
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form label.components-checkbox-control__label{
+  font-family:"averta_stdregular",sans-serif;
+  font-weight:normal;
+  font-size:14px
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form .btn-logging-in{
+  background-color:#8795a1;
+  color:#22292f
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form p.logged-in{
+  font-size:14px;
+  padding:20px 0px 10px 0px;
+  font-family:"averta_stdsemibold",sans-serif
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form p.logged-in .name{
+  color:#2beaed
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form p.logged-in a.logout{
+  color:#8795a1
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form p.logged-in :hover{
+  text-decoration:underline;
+  cursor:pointer
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form .usage-data-sharing{
+  color:#2b343b;
+  font-weight:700;
+  font-size:18px;
+  padding:24px 0px 12px 0px;
+  font-family:"averta_stdbold",sans-serif
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form .privacy-policy{
+  font-size:12px;
+  line-height:16px;
+  margin:0;
+  text-indent:32px
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form .privacy-policy :hover{
+  cursor:pointer;
+  text-decoration:underline
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form .checkbox>div{
+  margin-bottom:0 !important
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form input[type=checkbox]{
+  border-color:#b8c2cc;
+  box-shadow:none !important
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form :checked{
+  background:#00c1a3;
+  border-color:#00c1a3 !important
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form a.create-account{
+  padding:10px;
+  border-radius:.5rem
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings .setup-form a.create-account :hover{
+  text-decoration:underline
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings footer{
+  width:100%;
+  text-align:center;
+  position:relative
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings footer div{
+  display:-ms-flexbox;
+  display:flex
+}
+
+#wpwrap div#wpcontent div#wpbody div#wpbody-content div#lottiefiles-admin-settings footer div svg{
+  -ms-flex-positive:1;
+      flex-grow:1
+}
+
+.h-auto{
+  height:auto !important
+}

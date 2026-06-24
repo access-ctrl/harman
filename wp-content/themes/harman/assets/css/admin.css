@@ -1,0 +1,21 @@
+.acf-tooltip.acf-fc-popup>ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.acf-tooltip.acf-fc-popup {
+  max-width: max-content;
+  margin: auto;
+  left: -150px !important;
+  right: 0px;
+  margin-top: 15px;
+}
+
+.acf-tooltip.acf-fc-popup .acfe-flexible-layout-thumbnail.acfe-flexible-layout-thumbnail-no-modal {
+  width: 400px;
+  height: 170px;
+}
+
+.user-order-items-table {
+  margin-top: 10px;
+}

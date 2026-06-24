@@ -1,0 +1,38 @@
+.lf-show:hover::after {
+  content: '';
+  background-color: rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.lf-show:hover .lf-show-item {
+  transform-origin: left center;
+  animation: grow 0.25s ease-in-out forwards;
+  z-index: 5;
+}
+
+.lf-show:not(:hover) .lf-show-item {
+  transform-origin: left center;
+  animation: shrink 0.25s ease-in-out forwards;
+}
+
+@keyframes grow {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes shrink {
+  0% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}

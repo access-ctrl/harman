@@ -1,0 +1,26 @@
+.folder-card-icon {
+  color: #f3f6f8;
+}
+
+.folder-card:hover .folder-card-icon {
+  color: #d9e0e6;
+}
+
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.35rem;
+}
+
+.thumbnail-grid :first-child {
+  grid-area: 1 / 1 / 3 / 6;
+}
+
+.thumbnail-grid :nth-child(2) {
+  grid-area: 1 / 6 / 2 / 9;
+}
+
+.thumbnail-grid :nth-child(3) {
+  grid-area: 2 / 6 / 2 / 9;
+}

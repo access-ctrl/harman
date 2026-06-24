@@ -1,0 +1,177 @@
+@import '../../assets/colors/colors.scss';
+@font-face {
+  font-family: 'averta_stdregular';
+  font-weight: normal;
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-regular-webfont.woff2) format('woff2');
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'averta_stdbold';
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-bold-webfont.woff2) format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'averta_stdsemibold';
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-semibold-webfont.woff2) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'averta_stdextrabold';
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-extrabold-webfont.woff2) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: auto;
+}
+
+#wpwrap {
+  height: 100%; // overriding wordpress padding
+  div#wpcontent {
+    height: 100%; // overriding wordpress padding
+    div#wpbody {
+      height: 100%; // overriding wordpress padding
+      div#wpbody-content {
+        height: 100%; // overriding wordpress padding
+        div#lottiefiles-admin-settings {
+          font-family: 'averta_stdregular', sans-serif;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          margin-left: -36px;
+
+          .font-bold {
+            font-family: 'averta_stdbold', sans-serif;
+            font-weight: bold;
+          }
+
+          div.header {
+            div.version {
+              justify-content: flex-end;
+              align-items: center;
+              span {
+                margin-right: 10px;
+                color: $grayScale400;
+                font-size: 13px;
+              }
+            }
+          }
+
+          .p-36 {
+            padding: 36px;
+          }
+
+          .setup-form {
+            background-color: $white;
+            padding: 50px;
+            margin: 36px;
+            flex-grow: 1;
+            border-radius: 8px;
+            h1 {
+              font-family: 'averta_stdbold', sans-serif;
+              font-size: 28px;
+              line-height: 40px;
+              margin: 0;
+            }
+            p {
+              font-style: normal;
+              font-weight: 600;
+              font-size: 20px;
+              margin: revert;
+            }
+            label.components-checkbox-control__label {
+              font-family: 'averta_stdregular', sans-serif;
+              font-weight: normal;
+              font-size: 14px;
+            }
+
+            .btn-logging-in {
+              background-color: $grayScale400;
+              color: $black;
+            }
+
+            p.logged-in {
+              font-size: 14px;
+              padding: 20px 0px 10px 0px;
+              font-family: 'averta_stdsemibold', sans-serif;
+              .name {
+                color: $teal;
+              }
+              a.logout {
+                color: $grayScale400;
+              }
+              :hover {
+                text-decoration: underline;
+                cursor: pointer;
+              }
+            }
+            .usage-data-sharing {
+              color: $gray700;
+              font-weight: 700;
+              font-size: 18px;
+              padding: 24px 0px 12px 0px;
+              font-family: 'averta_stdbold', sans-serif;
+            }
+            .privacy-policy {
+              font-size: 12px;
+              line-height: 16px;
+              margin: 0;
+              text-indent: 32px;
+
+              :hover {
+                cursor: pointer;
+                text-decoration: underline;
+              }
+            }
+
+            .checkbox {
+              > div {
+                margin-bottom: 0 !important;
+              }
+            }
+
+            input[type='checkbox'] {
+              border-color: $gray300;
+              box-shadow: none !important;
+            }
+            :checked {
+              background: $teal300;
+              border-color: $teal300 !important;
+            }
+
+            a.create-account {
+              padding: 10px;
+              border-radius: 0.5rem;
+              :hover {
+                text-decoration: underline;
+              }
+            }
+          }
+
+          footer {
+            width: 100%;
+            text-align: center;
+            position: relative;
+            div {
+              display: flex;
+              svg {
+                flex-grow: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.h-auto {
+  height: auto !important;
+}

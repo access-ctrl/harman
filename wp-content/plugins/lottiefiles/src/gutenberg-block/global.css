@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'averta_stdregular';
+  font-weight: normal;
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-regular-webfont.woff2) format('woff2');
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'averta_stdbold';
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-bold-webfont.woff2) format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'averta_stdsemibold';
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-semibold-webfont.woff2) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'averta_stdextrabold';
+  src: url(https://static2.lottiefiles.com/fonts/avertastd-extrabold-webfont.woff2) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: auto;
+}
+
+.first-child-full-width > :first-child {
+  width: 100%;
+}
+
+.font-lf-bold {
+  font-family: 'averta_stdbold', sans-serif;
+  font-weight: bold;
+}
+
+.inline {
+  display: block !important;
+}
+
+/* Hack for tailwind form styles */
+@layer base {
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select {
+    box-shadow: 0 0 0 transparent !important;
+    border-radius: 4px !important;
+    border-color: #8c8f94 !important;
+    background-color: #fff !important;
+    color: #2c3338 !important;
+  }
+}
+
+input[type='checkbox']:focus,
+input[type='color']:focus,
+input[type='date']:focus,
+input[type='datetime-local']:focus,
+input[type='datetime']:focus,
+input[type='email']:focus,
+input[type='month']:focus,
+input[type='number']:focus,
+input[type='password']:focus,
+input[type='radio']:focus,
+input[type='search']:focus,
+input[type='tel']:focus,
+input[type='text']:focus,
+input[type='time']:focus,
+input[type='url']:focus,
+input[type='week']:focus,
+select:focus,
+textarea:focus {
+  border-color: #2271b1 !important;
+  box-shadow: 0 0 0 1px #2271b1 !important;
+  outline: 2px solid transparent !important;
+}

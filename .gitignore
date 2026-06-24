@@ -1,0 +1,32 @@
+# Uploads
+wp-content/uploads/
+
+# Cache
+wp-content/cache/
+wp-content/upgrade/
+wp-content/ai1wm-backups/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+wp-config.php
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+adminer.php
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
+
+# Backup Files
+*.sql
+*.zip
+*.tar.gz
