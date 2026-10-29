@@ -26,8 +26,13 @@ class Stripe_Client {
 		return (string) Settings::get( 'stripe_' . self::mode() . '_whsec' );
 	}
 
+	/** A secret (or restricted) key that matches the selected mode, e.g. sk_test_... in test mode. */
+	public static function valid_secret_key( string $key, string $mode ): bool {
+		return (bool) preg_match( '/^(sk|rk)_' . ( 'live' === $mode ? 'live' : 'test' ) . '_[A-Za-z0-9]{16,}$/', $key );
+	}
+
 	public static function configured(): bool {
-		return '' !== self::secret_key();
+		return self::valid_secret_key( self::secret_key(), self::mode() );
 	}
 
 	/** @return array|\WP_Error Decoded JSON body. */

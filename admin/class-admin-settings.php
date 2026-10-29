@@ -36,12 +36,14 @@ class Admin_Settings {
 		$ph     = ( $secret && '' !== (string) $s[ $key ] ) ? '•••••••• (saved, leave blank to keep)' : '';
 		echo '<tr><th scope="row"><label for="' . esc_attr( 'fwh_sb_' . $key ) . '">' . esc_html( $label ) . '</label></th><td>';
 		printf(
-			'<input id="%1$s" name="%2$s" type="%3$s" value="%4$s" placeholder="%5$s" class="regular-text" autocomplete="off">',
+			'<input id="%1$s" name="%2$s" type="%3$s" value="%4$s" placeholder="%5$s" class="regular-text" autocomplete="%6$s" %7$s>',
 			esc_attr( 'fwh_sb_' . $key ),
 			esc_attr( $name ),
 			esc_attr( $secret ? 'password' : $type ),
 			esc_attr( $value ),
-			esc_attr( $ph )
+			esc_attr( $ph ),
+			$secret ? 'new-password' : 'off', // new-password stops browsers filling saved passwords into key fields.
+			$secret ? 'data-lpignore="true" data-1p-ignore="true"' : ''
 		);
 		if ( '' !== $help ) {
 			echo '<p class="description">' . esc_html( $help ) . '</p>';
@@ -56,6 +58,20 @@ class Admin_Settings {
 		$s = Settings::all();
 		echo '<div class="wrap"><h1>' . esc_html__( 'Speaking Booking Settings', 'fwh-speaking-booking' ) . '</h1>';
 		settings_errors( Settings::OPTION );
+		$mode = Stripe_Client::mode();
+		if ( ! Stripe_Client::configured() ) {
+			echo '<div class="notice notice-warning"><p>' . esc_html(
+				sprintf(
+					/* translators: %s: test or live */
+					__( 'Payments are not ready: the Stripe %s secret key is missing or is not a valid %s-mode key. Bookings will fail until it is fixed.', 'fwh-speaking-booking' ),
+					$mode,
+					$mode
+				)
+			) . '</p></div>';
+		}
+		if ( ! in_array( strtolower( (string) Settings::get( 'currency' ) ), Settings::CURRENCIES, true ) ) {
+			echo '<div class="notice notice-warning"><p>' . esc_html__( 'The saved currency is not one Stripe supports (India is INR, not IND). Please correct it.', 'fwh-speaking-booking' ) . '</p></div>';
+		}
 		echo '<form method="post" action="options.php">';
 		settings_fields( 'fwh_sb_settings_group' );
 

@@ -58,8 +58,8 @@ class Bookings {
 
 		$amount = Settings::price_minor();
 		if ( $amount <= 0 || ! Stripe_Client::configured() ) {
-			Log::error( 'Booking attempted but price or Stripe key is not configured.' );
-			return new \WP_Error( 'fwh_sb_unavailable', __( 'Booking is temporarily unavailable. Please try again later.', 'fwh-speaking-booking' ), array( 'status' => 503 ) );
+			Log::error( 'Booking attempted but the price is zero or the Stripe secret key is missing or not a valid ' . Stripe_Client::mode() . '-mode key.' );
+			return new \WP_Error( 'fwh_sb_unavailable', __( 'Booking is temporarily unavailable. Please try again later.', 'fwh-speaking-booking' ), array( 'status' => 424 ) );
 		}
 
 		// Stop one person from tying up many slots with unpaid holds.
@@ -155,7 +155,7 @@ class Bookings {
 		);
 		if ( is_wp_error( $session ) || empty( $session['id'] ) || empty( $session['url'] ) ) {
 			self::expire_held( $booking_id ); // Free the slot at once.
-			return new \WP_Error( 'fwh_sb_payment', __( 'We could not start the payment. Please try again.', 'fwh-speaking-booking' ), array( 'status' => 502 ) );
+			return new \WP_Error( 'fwh_sb_payment', __( 'We could not start the payment. Please try again.', 'fwh-speaking-booking' ), array( 'status' => 424 ) );
 		}
 		self::update( $booking_id, array( 'stripe_session_id' => (string) $session['id'] ) );
 

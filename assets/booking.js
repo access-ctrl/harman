@@ -321,7 +321,7 @@
 		}).then(function (r) {
 			return r.json().catch(function () { return {}; }).then(function (j) {
 				if (!r.ok) {
-					var e = new Error(j && j.message ? j.message : 'Something went wrong. Please try again.');
+					var e = new Error(j && j.message ? j.message : 'We could not complete your booking just now. Please try again in a moment or contact us.');
 					e.status = r.status;
 					throw e;
 				}

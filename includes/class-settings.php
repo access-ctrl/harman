@@ -63,9 +63,18 @@ class Settings {
 		return $all[ $key ] ?? null;
 	}
 
-	/** Price in minor currency units (e.g. cents). */
+	/** Currencies Stripe Checkout accepts (lower-case ISO 4217). */
+	public const CURRENCIES = array(
+		'usd', 'aed', 'afn', 'all', 'amd', 'ang', 'aoa', 'ars', 'aud', 'awg', 'azn', 'bam', 'bbd', 'bdt', 'bgn', 'bif', 'bmd', 'bnd', 'bob', 'brl', 'bsd', 'bwp', 'byn', 'bzd', 'cad', 'cdf', 'chf', 'clp', 'cny', 'cop', 'crc', 'cve', 'czk', 'djf', 'dkk', 'dop', 'dzd', 'egp', 'etb', 'eur', 'fjd', 'fkp', 'gbp', 'gel', 'gip', 'gmd', 'gnf', 'gtq', 'gyd', 'hkd', 'hnl', 'htg', 'huf', 'idr', 'ils', 'inr', 'isk', 'jmd', 'jpy', 'kes', 'kgs', 'khr', 'kmf', 'krw', 'kyd', 'kzt', 'lak', 'lbp', 'lkr', 'lrd', 'lsl', 'mad', 'mdl', 'mga', 'mkd', 'mmk', 'mnt', 'mop', 'mur', 'mvr', 'mwk', 'mxn', 'myr', 'mzn', 'nad', 'ngn', 'nio', 'nok', 'npr', 'nzd', 'pab', 'pen', 'pgk', 'php', 'pkr', 'pln', 'pyg', 'qar', 'ron', 'rsd', 'rub', 'rwf', 'sar', 'sbd', 'scr', 'sek', 'sgd', 'shp', 'sos', 'srd', 'szl', 'thb', 'tjs', 'top', 'try', 'ttd', 'twd', 'tzs', 'uah', 'ugx', 'uyu', 'uzs', 'vnd', 'vuv', 'wst', 'xaf', 'xcd', 'xof', 'xpf', 'yer', 'zar', 'zmw',
+	);
+
+	/** Currencies with no minor unit: the amount is sent to Stripe as-is, not multiplied by 100. */
+	private const ZERO_DECIMAL = array( 'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga', 'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf' );
+
+	/** Price in minor currency units (e.g. cents; whole units for zero-decimal currencies). */
 	public static function price_minor(): int {
-		return (int) round( (float) self::get( 'price' ) * 100 );
+		$factor = in_array( strtolower( (string) self::get( 'currency' ) ), self::ZERO_DECIMAL, true ) ? 1 : 100;
+		return (int) round( (float) self::get( 'price' ) * $factor );
 	}
 
 	public static function sanitize( $input ): array {
@@ -79,10 +88,29 @@ class Settings {
 				$out[ $k ] = sanitize_text_field( wp_unslash( $input[ $k ] ) );
 			}
 		}
+		// Secrets: blank keeps the stored value; anything else must look like the right kind of key.
+		$formats = array(
+			'stripe_test_sk'    => array( '/^(sk|rk)_test_[A-Za-z0-9]{16,}$/', 'a Stripe test secret key (starts with sk_test_)' ),
+			'stripe_live_sk'    => array( '/^(sk|rk)_live_[A-Za-z0-9]{16,}$/', 'a Stripe live secret key (starts with sk_live_)' ),
+			'stripe_test_whsec' => array( '/^whsec_[A-Za-z0-9]{16,}$/', 'a Stripe webhook signing secret (starts with whsec_)' ),
+			'stripe_live_whsec' => array( '/^whsec_[A-Za-z0-9]{16,}$/', 'a Stripe webhook signing secret (starts with whsec_)' ),
+		);
 		foreach ( self::SECRET_KEYS as $k ) {
 			$v = isset( $input[ $k ] ) ? trim( sanitize_text_field( wp_unslash( $input[ $k ] ) ) ) : '';
-			if ( '' !== $v ) {
-				$out[ $k ] = $v;
+			if ( '' === $v ) {
+				continue;
+			}
+			if ( isset( $formats[ $k ] ) && ! preg_match( $formats[ $k ][0], $v ) ) {
+				/* translators: %s: description of the expected key */
+				add_settings_error( self::OPTION, $k, sprintf( __( 'That value is not %s, so it was not saved. If your browser filled in a saved password, clear the field.', 'fwh-speaking-booking' ), $formats[ $k ][1] ) );
+				continue;
+			}
+			$out[ $k ] = $v;
+		}
+		foreach ( array( 'stripe_test_pk' => 'pk_test_', 'stripe_live_pk' => 'pk_live_' ) as $k => $prefix ) {
+			if ( isset( $out[ $k ] ) && '' !== $out[ $k ] && 0 !== strpos( $out[ $k ], $prefix ) ) {
+				add_settings_error( self::OPTION, $k, sprintf( /* translators: %s: prefix */ __( 'The publishable key should start with %s.', 'fwh-speaking-booking' ), $prefix ) );
+				$out[ $k ] = $old[ $k ];
 			}
 		}
 		$ints = array(
@@ -102,10 +130,10 @@ class Settings {
 		}
 		if ( isset( $input['currency'] ) ) {
 			$cur = strtolower( preg_replace( '/[^A-Za-z]/', '', wp_unslash( $input['currency'] ) ) );
-			if ( 3 === strlen( $cur ) ) {
+			if ( in_array( $cur, self::CURRENCIES, true ) ) {
 				$out['currency'] = $cur;
 			} else {
-				add_settings_error( self::OPTION, 'currency', __( 'Currency must be a 3-letter code such as CAD.', 'fwh-speaking-booking' ) );
+				add_settings_error( self::OPTION, 'currency', __( 'That is not a currency code Stripe supports (for example CAD, USD, INR - India is INR, not IND). The previous currency was kept.', 'fwh-speaking-booking' ) );
 			}
 		}
 		foreach ( array( 'coordinator_email', 'contact_email' ) as $k ) {
