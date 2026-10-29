@@ -13,15 +13,6 @@ class Admin_Trainers {
 
 	private const PAGE = 'fwh-sb-trainers';
 
-	private const DAYS = array(
-		1 => 'Monday',
-		2 => 'Tuesday',
-		3 => 'Wednesday',
-		4 => 'Thursday',
-		5 => 'Friday',
-		6 => 'Saturday',
-	);
-
 	public function init(): void {
 		add_action( 'admin_post_fwh_sb_save_trainer', array( $this, 'handle_save' ) );
 		add_action( 'admin_post_fwh_sb_toggle_trainer', array( $this, 'handle_toggle' ) );
@@ -52,7 +43,7 @@ class Admin_Trainers {
 			Notice::redirect( self::PAGE );
 		}
 
-		$rows = $this->parse_hours();
+		$rows = Hours_Input::parse_post();
 		if ( is_string( $rows ) ) {
 			Notice::add( 'error', $rows );
 			Notice::redirect( self::PAGE, $id ? $back : array( 'action' => 'new' ) );
@@ -74,49 +65,6 @@ class Admin_Trainers {
 		Repo::replace_hours( $id, $rows );
 		Notice::add( 'success', __( 'Trainer saved.', 'fwh-speaking-booking' ) );
 		Notice::redirect( self::PAGE, array( 'action' => 'edit', 'trainer' => $id ) );
-	}
-
-	/**
-	 * Validate submitted hour ranges. Returns rows or an error string.
-	 *
-	 * @return array|string
-	 */
-	private function parse_hours() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified in guard().
-		$days   = isset( $_POST['hours_day'] ) ? (array) wp_unslash( $_POST['hours_day'] ) : array();
-		$starts = isset( $_POST['hours_start'] ) ? (array) wp_unslash( $_POST['hours_start'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$ends   = isset( $_POST['hours_end'] ) ? (array) wp_unslash( $_POST['hours_end'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$rows   = array();
-		foreach ( $days as $i => $day ) {
-			$day   = (int) $day;
-			$start = isset( $starts[ $i ] ) ? sanitize_text_field( $starts[ $i ] ) : '';
-			$end   = isset( $ends[ $i ] ) ? sanitize_text_field( $ends[ $i ] ) : '';
-			if ( '' === $start && '' === $end ) {
-				continue;
-			}
-			if ( ! isset( self::DAYS[ $day ] ) || ! Time::valid_time( $start ) || ! Time::valid_time( $end ) ) {
-				return __( 'Each hour range needs a weekday (Mon-Sat) and valid start and end times.', 'fwh-speaking-booking' );
-			}
-			if ( $start >= $end ) {
-				return sprintf(
-					/* translators: %s: weekday name */
-					__( '%s: the end time must be after the start time.', 'fwh-speaking-booking' ),
-					self::DAYS[ $day ]
-				);
-			}
-			$rows[] = array( $day, $start, $end );
-		}
-		usort( $rows, static fn( $a, $b ) => array( $a[0], $a[1] ) <=> array( $b[0], $b[1] ) );
-		for ( $i = 1, $n = count( $rows ); $i < $n; $i++ ) {
-			if ( $rows[ $i ][0] === $rows[ $i - 1 ][0] && $rows[ $i ][1] < $rows[ $i - 1 ][2] ) {
-				return sprintf(
-					/* translators: %s: weekday name */
-					__( '%s: hour ranges overlap.', 'fwh-speaking-booking' ),
-					self::DAYS[ $rows[ $i ][0] ]
-				);
-			}
-		}
-		return $rows;
 	}
 
 	public function handle_toggle(): void {
@@ -232,22 +180,7 @@ class Admin_Trainers {
 
 		echo '<h2>' . esc_html__( 'Weekly hours (Toronto time, Mon-Sat)', 'fwh-speaking-booking' ) . '</h2>';
 		echo '<p class="description">' . esc_html__( 'Add several ranges per day if needed. Leave start and end blank to remove a row. Sunday is always closed.', 'fwh-speaking-booking' ) . '</p>';
-		echo '<table class="widefat" style="max-width:520px" id="fwh-sb-hours"><thead><tr><th>Day</th><th>Start</th><th>End</th></tr></thead><tbody>';
-		$rows = array();
-		foreach ( $hours as $h ) {
-			$rows[] = array( (int) $h->weekday, substr( $h->start_time, 0, 5 ), substr( $h->end_time, 0, 5 ) );
-		}
-		for ( $i = 0; $i < 4; $i++ ) { // Spare blank rows.
-			$rows[] = array( 1, '', '' );
-		}
-		foreach ( $rows as $r ) {
-			echo '<tr><td><select name="hours_day[]">';
-			foreach ( self::DAYS as $num => $label ) {
-				printf( '<option value="%d" %s>%s</option>', (int) $num, selected( $r[0], $num, false ), esc_html( $label ) );
-			}
-			printf( '</select></td><td><input type="time" name="hours_start[]" value="%s"></td><td><input type="time" name="hours_end[]" value="%s"></td></tr>', esc_attr( $r[1] ), esc_attr( $r[2] ) );
-		}
-		echo '</tbody></table>';
+		Hours_Input::render_table( $hours );
 		submit_button( $t ? __( 'Save trainer', 'fwh-speaking-booking' ) : __( 'Add trainer', 'fwh-speaking-booking' ) );
 		echo '</form>';
 

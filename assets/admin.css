@@ -1,0 +1,14 @@
+.fwh-sb-admin .fwh-sb-filters { margin: 12px 0; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.fwh-sb-admin .fwh-sb-bookings td, .fwh-sb-admin .fwh-sb-bookings th { vertical-align: top; }
+.fwh-sb-calnav { display: flex; gap: 8px; align-items: center; }
+.fwh-sb-cal { display: grid; gap: 4px; margin-top: 8px; }
+.fwh-sb-cal-month { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.fwh-sb-cal-week { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.fwh-sb-cal-dow { font-weight: 600; text-align: center; padding: 4px; }
+.fwh-sb-cal-cell { background: #fff; border: 1px solid #dcdcde; min-height: 90px; padding: 4px; overflow: hidden; }
+.fwh-sb-cal-week .fwh-sb-cal-cell { min-height: 220px; }
+.fwh-sb-cal-cell.is-empty { background: transparent; border-color: transparent; }
+.fwh-sb-cal-cell.is-today { border-color: #2271b1; box-shadow: inset 0 0 0 1px #2271b1; }
+.fwh-sb-cal-day { color: #646970; font-size: 12px; }
+.fwh-sb-cal-event { background: #f0f6fc; border-left: 3px solid #2271b1; margin-top: 4px; padding: 2px 4px; font-size: 12px; word-break: break-word; }
+@media (max-width: 782px) { .fwh-sb-cal { grid-template-columns: 1fr; } .fwh-sb-cal-dow, .fwh-sb-cal-cell.is-empty { display: none; } .fwh-sb-cal-cell { min-height: 0; } }

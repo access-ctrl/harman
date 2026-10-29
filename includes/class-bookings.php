@@ -323,6 +323,45 @@ class Bookings {
 		self::expire_held( (int) $b->id );
 	}
 
+	/**
+	 * Coordinator cancel: frees the slot and removes the calendar event. Sends no emails.
+	 *
+	 * @return string cancelled | cancelled_event_failed | not_cancellable
+	 */
+	public static function cancel( int $id ): string {
+		global $wpdb;
+		$b = self::get( $id );
+		if ( ! $b || ! in_array( $b->status, array( 'paid', 'held' ), true ) ) {
+			return 'not_cancellable';
+		}
+		$t    = self::t();
+		$rows = (int) $wpdb->query( $wpdb->prepare( "UPDATE {$t} SET status = 'cancelled', updated_utc = %s WHERE id = %d AND status IN ('paid','held')", Time::now_utc(), $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( 1 !== $rows ) {
+			return 'not_cancellable';
+		}
+		wp_clear_scheduled_hook( Meet_Service::RETRY_HOOK, array( $id ) );
+
+		// A still-open Checkout Session must not be payable after cancellation.
+		if ( 'held' === $b->status && ! empty( $b->stripe_session_id ) ) {
+			Stripe_Client::expire_session( $b->stripe_session_id );
+		}
+
+		if ( ! empty( $b->google_event_id ) ) {
+			// Delete with the connection that created the event.
+			$conn = 'fallback' === $b->google_calendar_owner ? 0 : (int) $b->trainer_id;
+			$res  = Google_Client::delete_event( $conn, $b->google_event_id );
+			if ( is_wp_error( $res ) ) {
+				$data = $res->get_error_data();
+				$http = is_array( $data ) ? (int) ( $data['http'] ?? 0 ) : 0;
+				if ( ! in_array( $http, array( 404, 410 ), true ) ) { // Already gone counts as deleted.
+					error_log( '[fwh-sb] Could not delete calendar event for ' . $b->ref ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					return 'cancelled_event_failed';
+				}
+			}
+		}
+		return 'cancelled';
+	}
+
 	/** Cron: settle held bookings whose hold lapsed. */
 	public static function sweep_holds(): void {
 		global $wpdb;

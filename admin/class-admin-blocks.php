@@ -27,38 +27,16 @@ class Admin_Blocks {
 
 	public function handle_add(): void {
 		$this->guard( 'fwh_sb_add_block' );
-		$tid        = isset( $_POST['trainer_id'] ) ? absint( $_POST['trainer_id'] ) : 0;
-		$start_date = isset( $_POST['start_date'] ) ? sanitize_text_field( wp_unslash( $_POST['start_date'] ) ) : '';
-		$end_date   = isset( $_POST['end_date'] ) ? sanitize_text_field( wp_unslash( $_POST['end_date'] ) ) : '';
-		$start_time = isset( $_POST['start_time'] ) ? sanitize_text_field( wp_unslash( $_POST['start_time'] ) ) : '';
-		$end_time   = isset( $_POST['end_time'] ) ? sanitize_text_field( wp_unslash( $_POST['end_time'] ) ) : '';
-		$note       = isset( $_POST['note'] ) ? sanitize_text_field( wp_unslash( $_POST['note'] ) ) : '';
-
-		if ( '' === $end_date ) {
-			$end_date = $start_date;
-		}
-		if ( ! Time::valid_date( $start_date ) || ! Time::valid_date( $end_date ) ) {
-			$this->fail( __( 'Please enter valid dates.', 'fwh-speaking-booking' ) );
+		$tid   = isset( $_POST['trainer_id'] ) ? absint( $_POST['trainer_id'] ) : 0;
+		$note  = isset( $_POST['note'] ) ? sanitize_text_field( wp_unslash( $_POST['note'] ) ) : '';
+		$range = Block_Input::parse_post();
+		if ( is_string( $range ) ) {
+			$this->fail( $range );
 		}
 		if ( $tid && ! Repo::trainer( $tid ) ) {
 			$this->fail( __( 'Trainer not found.', 'fwh-speaking-booking' ) );
 		}
-		$timed = '' !== $start_time || '' !== $end_time;
-		if ( $timed ) {
-			if ( ! Time::valid_time( $start_time ) || ! Time::valid_time( $end_time ) ) {
-				$this->fail( __( 'For a time range enter both a valid start and end time.', 'fwh-speaking-booking' ) );
-			}
-			$start_utc = Time::toronto_to_utc( $start_date, $start_time );
-			$end_utc   = Time::toronto_to_utc( $end_date, $end_time );
-		} else {
-			// Whole days: midnight Toronto on the first day to midnight after the last day.
-			$next      = ( new \DateTimeImmutable( $end_date, Time::utc() ) )->modify( '+1 day' )->format( 'Y-m-d' );
-			$start_utc = Time::toronto_to_utc( $start_date, '00:00' );
-			$end_utc   = Time::toronto_to_utc( $next, '00:00' );
-		}
-		if ( ! $start_utc || ! $end_utc || $end_utc <= $start_utc ) {
-			$this->fail( __( 'The end must be after the start.', 'fwh-speaking-booking' ) );
-		}
+		list( $start_utc, $end_utc ) = $range;
 
 		Repo::add_block( $tid ? $tid : null, $start_utc, $end_utc, $note, get_current_user_id() );
 		Notice::add( 'success', __( 'Block added.', 'fwh-speaking-booking' ) );
@@ -96,9 +74,7 @@ class Admin_Blocks {
 			printf( '<option value="%d">%s</option>', (int) $t->id, esc_html( $t->name ) );
 		}
 		echo '</select></td></tr>';
-		echo '<tr><th><label for="fwh_sb_b_sd">' . esc_html__( 'From date', 'fwh-speaking-booking' ) . '</label></th><td><input id="fwh_sb_b_sd" type="date" name="start_date" required> <input type="time" name="start_time" aria-label="' . esc_attr__( 'From time', 'fwh-speaking-booking' ) . '"></td></tr>';
-		echo '<tr><th><label for="fwh_sb_b_ed">' . esc_html__( 'To date', 'fwh-speaking-booking' ) . '</label></th><td><input id="fwh_sb_b_ed" type="date" name="end_date"> <input type="time" name="end_time" aria-label="' . esc_attr__( 'To time', 'fwh-speaking-booking' ) . '"></td></tr>';
-		echo '<tr><th><label for="fwh_sb_b_n">' . esc_html__( 'Note', 'fwh-speaking-booking' ) . '</label></th><td><input id="fwh_sb_b_n" name="note" class="regular-text" maxlength="255"></td></tr>';
+		Block_Input::render_fields();
 		echo '</table>';
 		submit_button( __( 'Add block', 'fwh-speaking-booking' ) );
 		echo '</form>';
