@@ -74,14 +74,17 @@ class Topbar {
 				<?php if ( '' !== $text ) : ?>
 					<p class="fwh-sb-topbar__text"><?php echo esc_html( $text ); ?></p>
 				<?php endif; ?>
-				<button type="button" class="fwh-sb-topbar__btn" aria-haspopup="dialog" aria-controls="fwh-sb-modal"><?php echo esc_html( $button ); ?></button>
+				<button type="button" class="fwh-sb-topbar__btn" aria-haspopup="dialog" aria-controls="fwh-sb-modal"><span><?php echo esc_html( $button ); ?></span><span class="fwh-sb-topbar__arrow" aria-hidden="true">&rarr;</span></button>
 			</div>
 		</div>
 		<div class="fwh-sb-modal" id="fwh-sb-modal" role="dialog" aria-modal="true" aria-labelledby="fwh-sb-modal-title" hidden>
 			<div class="fwh-sb-modal__backdrop" data-fwh-close></div>
 			<div class="fwh-sb-modal__panel" tabindex="-1">
 				<div class="fwh-sb-modal__head">
-					<span class="fwh-sb-modal__title" id="fwh-sb-modal-title"><?php echo esc_html( (string) Settings::get( 'session_name' ) ); ?></span>
+					<span class="fwh-sb-modal__heading">
+						<span class="fwh-sb-modal__title" id="fwh-sb-modal-title"><?php echo esc_html( (string) Settings::get( 'session_name' ) ); ?></span>
+						<span class="fwh-sb-modal__sub"><?php echo esc_html( trim( sprintf( /* translators: %d: minutes */ __( '%d minutes', 'fwh-speaking-booking' ), (int) Settings::get( 'duration' ) ) . ( '' !== Shortcode::price_label() ? ' · ' . Shortcode::price_label() : '' ) ) ); ?></span>
+					</span>
 					<button type="button" class="fwh-sb-modal__close" data-fwh-close aria-label="<?php esc_attr_e( 'Close', 'fwh-speaking-booking' ); ?>">&times;</button>
 				</div>
 				<div class="fwh-sb-wrap" id="fwh-sb-app">

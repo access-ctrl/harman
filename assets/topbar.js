@@ -9,8 +9,16 @@
 
 	var openBtn = bar.querySelector('.fwh-sb-topbar__btn');
 	var panel = modal.querySelector('.fwh-sb-modal__panel');
+	var head = modal.querySelector('.fwh-sb-modal__head');
+	var root = document.documentElement;
 	var lastFocus = null;
 	var loaded = false;
+	var closeTimer = null;
+	var CLOSE_MS = 240;
+
+	function reducedMotion() {
+		return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+	}
 
 	function load() {
 		if (loaded) { return; }
@@ -30,27 +38,55 @@
 			.filter(function (n) { return n.offsetParent !== null || n === document.activeElement; });
 	}
 
+	function lockScroll() {
+		// Compensate for the vanishing scrollbar so the page behind does not jump sideways.
+		var gap = window.innerWidth - root.clientWidth;
+		root.style.setProperty('--fwh-sb-sbw', (gap > 0 ? gap : 0) + 'px');
+		root.classList.add('fwh-sb-lock');
+	}
+
+	function unlockScroll() {
+		root.classList.remove('fwh-sb-lock');
+		root.style.removeProperty('--fwh-sb-sbw');
+	}
+
 	function open() {
-		if (!modal.hidden) { panel.focus(); return; } // Already open: keep the original focus target.
-		lastFocus = document.activeElement;
+		if (!modal.hidden && !modal.classList.contains('is-closing')) { panel.focus(); return; } // Already open: keep the original focus target.
+		if (modal.hidden) { lastFocus = document.activeElement; }
+		window.clearTimeout(closeTimer);
+		modal.classList.remove('is-closing');
 		modal.hidden = false;
-		document.documentElement.classList.add('fwh-sb-lock');
+		lockScroll();
 		openBtn.setAttribute('aria-expanded', 'true');
 		load();
+		void modal.offsetWidth; // Force a reflow so the entrance transition runs.
+		modal.classList.add('is-open');
 		panel.focus();
 	}
 
-	function close() {
+	function finishClose() {
 		modal.hidden = true;
-		document.documentElement.classList.remove('fwh-sb-lock');
-		openBtn.setAttribute('aria-expanded', 'false');
+		modal.classList.remove('is-closing');
+		unlockScroll();
 		if (lastFocus && lastFocus.focus) { lastFocus.focus(); } else { openBtn.focus(); }
+	}
+
+	function close() {
+		if (modal.hidden || modal.classList.contains('is-closing')) { return; }
+		openBtn.setAttribute('aria-expanded', 'false');
+		modal.classList.remove('is-open');
+		if (reducedMotion()) { finishClose(); return; }
+		modal.classList.add('is-closing');
+		closeTimer = window.setTimeout(finishClose, CLOSE_MS);
 	}
 
 	openBtn.addEventListener('click', open);
 	modal.addEventListener('click', function (ev) {
 		if (ev.target.closest && ev.target.closest('[data-fwh-close]')) { close(); }
 	});
+	panel.addEventListener('scroll', function () {
+		head.classList.toggle('is-scrolled', panel.scrollTop > 4);
+	}, { passive: true });
 	document.addEventListener('keydown', function (ev) {
 		if (modal.hidden) { return; }
 		if (ev.key === 'Escape') { ev.preventDefault(); close(); return; }

@@ -18,7 +18,9 @@
 		tz: detectTz(),
 		monthKey: null,     // 'YYYY-MM'
 		day: null,          // 'YYYY-MM-DD' in state.tz
-		slot: null          // ISO string
+		slot: null,         // ISO string
+		enter: {},          // which blocks animate in on the next render
+		pop: false          // animate the newly selected day/time
 	};
 	var els = {};
 	var start = function () {};
@@ -55,6 +57,38 @@
 		} catch (e) {
 			return cfg.price.toFixed(2) + ' ' + cfg.currency;
 		}
+	}
+
+	function reduceMotion() {
+		return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+	}
+
+	/** Gently bring a newly revealed block into view (inside the modal this scrolls the panel). */
+	function nudge(node) {
+		if (!node || !node.scrollIntoView) { return; }
+		try { node.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'nearest' }); } catch (e) { /* ignore */ }
+	}
+
+	/** Restart a one-shot CSS animation class on a node. */
+	function play(node, cls) {
+		if (!node) { return; }
+		node.classList.remove(cls);
+		void node.offsetWidth;
+		node.classList.add(cls);
+	}
+
+	function checkIcon() {
+		var ns = 'http://www.w3.org/2000/svg';
+		var svg = document.createElementNS(ns, 'svg');
+		svg.setAttribute('viewBox', '0 0 52 52');
+		svg.setAttribute('class', 'fwh-sb-check');
+		svg.setAttribute('aria-hidden', 'true');
+		var ring = document.createElementNS(ns, 'circle');
+		ring.setAttribute('cx', '26'); ring.setAttribute('cy', '26'); ring.setAttribute('r', '24'); ring.setAttribute('class', 'fwh-sb-check-ring');
+		var tick = document.createElementNS(ns, 'path');
+		tick.setAttribute('d', 'M15 27l8 8 14-16'); tick.setAttribute('class', 'fwh-sb-check-tick');
+		svg.appendChild(ring); svg.appendChild(tick);
+		return svg;
 	}
 
 	function el(tag, attrs, text) {
@@ -98,6 +132,14 @@
 
 	function build() {
 		clear(body);
+		els.steps = el('ol', { 'class': 'fwh-sb-steps', 'aria-label': 'Booking progress' });
+		['Day', 'Time', 'Details'].forEach(function (label, i) {
+			var li = el('li', null);
+			li.appendChild(el('span', { 'class': 'fwh-sb-step-dot', 'aria-hidden': 'true' }, String(i + 1)));
+			li.appendChild(el('span', { 'class': 'fwh-sb-step-label' }, label));
+			els.steps.appendChild(li);
+		});
+		body.appendChild(els.steps);
 		var tzRow = el('div', { 'class': 'fwh-sb-tzrow' });
 		var tzLabel = el('label', { 'for': 'fwh-sb-tz' }, 'Your time zone');
 		els.tz = el('select', { id: 'fwh-sb-tz' });
@@ -108,6 +150,7 @@
 		});
 		els.tz.addEventListener('change', function () {
 			state.tz = els.tz.value; state.day = null; state.slot = null; state.monthKey = null;
+			state.enter = { cal: true };
 			render();
 		});
 		tzRow.appendChild(tzLabel); tzRow.appendChild(els.tz);
@@ -127,6 +170,9 @@
 		box.appendChild(el('span', { 'class': 'fwh-sb-spinner', 'aria-hidden': 'true' }));
 		box.appendChild(el('span', null, msg));
 		els.cal.appendChild(box);
+		var skel = el('div', { 'class': 'fwh-sb-skel', 'aria-hidden': 'true' });
+		for (var i = 0; i < 35; i++) { skel.appendChild(el('span', { style: '--i:' + (i % 7) })); }
+		els.cal.appendChild(skel);
 		body.setAttribute('aria-busy', 'true');
 	}
 
@@ -152,7 +198,31 @@
 		return map;
 	}
 
+	function updateSteps() {
+		if (!els.steps) { return; }
+		var step = state.slot ? 3 : (state.day ? 2 : 1);
+		Array.prototype.forEach.call(els.steps.children, function (li, i) {
+			li.classList.toggle('is-active', i === step - 1);
+			li.classList.toggle('is-done', i < step - 1);
+			if (i === step - 1) { li.setAttribute('aria-current', 'step'); } else { li.removeAttribute('aria-current'); }
+		});
+	}
+
+	/** Play entrance animations only on the blocks that are new this render. */
+	function finishRender() {
+		var map = { cal: els.cal, slots: els.slots, form: els.form };
+		Object.keys(map).forEach(function (k) {
+			// Only blocks that are new this render carry the class, so later re-renders never replay it.
+			if (state.enter[k] && map[k].firstChild) { play(map[k], 'is-enter'); } else { map[k].classList.remove('is-enter'); }
+		});
+		if (state.pop) {
+			Array.prototype.forEach.call(body.querySelectorAll('.fwh-sb-day.is-selected, .fwh-sb-slot.is-selected'), function (n) { play(n, 'is-pop'); });
+		}
+		state.enter = {}; state.pop = false;
+	}
+
 	function render() {
+		updateSteps();
 		body.removeAttribute('aria-busy');
 		var map = slotsByDay();
 		var days = Object.keys(map).sort();
@@ -168,6 +238,7 @@
 		renderCalendar(map, months);
 		if (state.day && map[state.day]) { renderSlots(map[state.day]); }
 		if (state.slot) { renderForm(); }
+		finishRender();
 	}
 
 	function renderCalendar(map, months) {
@@ -178,8 +249,8 @@
 		var prev = el('button', { type: 'button', 'class': 'fwh-sb-nav', 'aria-label': 'Previous month' }, '‹');
 		var next = el('button', { type: 'button', 'class': 'fwh-sb-nav', 'aria-label': 'Next month' }, '›');
 		prev.disabled = idx <= 0; next.disabled = idx >= months.length - 1;
-		prev.addEventListener('click', function () { state.monthKey = months[idx - 1]; render(); });
-		next.addEventListener('click', function () { state.monthKey = months[idx + 1]; render(); });
+		prev.addEventListener('click', function () { state.monthKey = months[idx - 1]; state.enter = { cal: true }; render(); });
+		next.addEventListener('click', function () { state.monthKey = months[idx + 1]; state.enter = { cal: true }; render(); });
 		var title = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, 1)));
 		head.appendChild(prev); head.appendChild(el('strong', { 'aria-live': 'polite' }, title)); head.appendChild(next);
 		els.cal.appendChild(head);
@@ -236,9 +307,11 @@
 	function onDay(ev) {
 		state.day = ev.currentTarget.getAttribute('data-day');
 		state.slot = null;
+		state.enter = { slots: true }; state.pop = true;
 		render();
 		var first = els.slots.querySelector('button');
-		if (first) { first.focus(); }
+		if (first) { first.focus({ preventScroll: true }); }
+		nudge(els.slots);
 	}
 
 	function renderSlots(list) {
@@ -248,9 +321,10 @@
 		parts.push('times shown in ' + state.tz.replace(/_/g, ' '));
 		els.slots.appendChild(el('p', { 'class': 'fwh-sb-note' }, parts.join(' · ')));
 		var wrap = el('div', { 'class': 'fwh-sb-slotlist', role: 'group', 'aria-label': 'Available times' });
-		list.forEach(function (iso) {
+		list.forEach(function (iso, idx) {
 			var b = el('button', { type: 'button', 'class': 'fwh-sb-slot' + (iso === state.slot ? ' is-selected' : ''), 'aria-pressed': iso === state.slot ? 'true' : 'false' }, timeLabel(iso, state.tz));
-			b.addEventListener('click', function () { state.slot = iso; render(); var f = els.form.querySelector('input'); if (f) { f.focus(); } });
+			b.style.setProperty('--i', String(Math.min(idx, 12)));
+			b.addEventListener('click', function () { state.slot = iso; state.enter = { form: true }; state.pop = true; render(); var f = els.form.querySelector('input'); if (f) { f.focus({ preventScroll: true }); } nudge(els.form); });
 			wrap.appendChild(b);
 		});
 		els.slots.appendChild(wrap);
@@ -288,10 +362,12 @@
 			err.textContent = v.error || '';
 			if (v.error) {
 				var bad = form.elements[v.field];
-				if (bad) { bad.setAttribute('aria-invalid', 'true'); bad.focus(); }
+				if (bad) { bad.setAttribute('aria-invalid', 'true'); bad.focus(); play(bad.parentNode, 'is-shake'); }
+				play(err, 'is-shake');
 				return;
 			}
 			submit.disabled = true;
+			submit.classList.add('is-loading');
 			submit.textContent = 'Please wait\u2026';
 			book(v.data).then(function (res) {
 				if (!res || typeof res.checkout_url !== 'string' || res.checkout_url.indexOf('https://') !== 0) {
@@ -300,6 +376,8 @@
 				window.location.href = res.checkout_url;
 			}).catch(function (e) {
 				err.textContent = e.message;
+				play(err, 'is-shake');
+				submit.classList.remove('is-loading');
 				submit.disabled = false;
 				submit.textContent = 'Continue to payment';
 				if (e.status === 409) { refreshSlots(e.message); }
@@ -361,8 +439,9 @@
 		box.appendChild(el('h3', null, 'Confirming your payment'));
 		box.appendChild(el('p', null, 'Please keep this page open\u2026'));
 
-		function done(title, msg, restart) {
+		function done(title, msg, restart, ok) {
 			clear(box);
+			if (ok) { box.appendChild(checkIcon()); }
 			box.appendChild(el('h3', null, title));
 			box.appendChild(el('p', null, msg));
 			if (restart) {
@@ -375,7 +454,7 @@
 			api('booking-status?ref=' + encodeURIComponent(q.ref) + '&session_id=' + encodeURIComponent(q.session_id)).then(function (res) {
 				if (res.status === 'paid') {
 					var tz = res.student_tz || state.tz;
-					done('Payment received', 'Your session is booked for ' + longLabel(res.start, tz) + ' (' + tz.replace(/_/g, ' ') + '). Booking reference ' + q.ref + '. We are sending your confirmation email with the meeting link.', false);
+					done('Payment received', 'Your session is booked for ' + longLabel(res.start, tz) + ' (' + tz.replace(/_/g, ' ') + '). Booking reference ' + q.ref + '. We are sending your confirmation email with the meeting link.', false, true);
 					return;
 				}
 				if (res.status === 'expired' || res.status === 'cancelled') {
@@ -423,6 +502,7 @@
 			showLoading('Loading available times\u2026');
 			loadSlots().then(function (slots) {
 				state.slots = slots;
+				state.enter = { cal: true };
 				render();
 				if (cancelled) {
 					els.status.textContent = 'Payment cancelled. Your time has been released; please choose a time again.';

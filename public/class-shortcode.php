@@ -88,12 +88,17 @@ class Shortcode {
 		);
 	}
 
+	/** e.g. "25.00 CAD", or '' when no price is set. */
+	public static function price_label(): string {
+		$price = (float) Settings::get( 'price' );
+		return $price > 0 ? number_format_i18n( $price, 2 ) . ' ' . strtoupper( (string) Settings::get( 'currency' ) ) : '';
+	}
+
 	public function render(): string {
 		$this->no_cache();
 		$this->enqueue();
 
-		$price = (float) Settings::get( 'price' );
-		$label = $price > 0 ? number_format_i18n( $price, 2 ) . ' ' . strtoupper( (string) Settings::get( 'currency' ) ) : '';
+		$label = self::price_label();
 
 		ob_start();
 		?>
