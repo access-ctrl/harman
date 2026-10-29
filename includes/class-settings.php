@@ -42,6 +42,9 @@ class Settings {
 			'stripe_live_whsec'    => '',
 			'google_client_id'     => '',
 			'google_client_secret' => '',
+			'topbar_enabled'       => 0,
+			'topbar_text'          => 'Practise your French one-to-one with a trainer.',
+			'topbar_button'        => 'Book a speaking session',
 		);
 	}
 
@@ -70,7 +73,7 @@ class Settings {
 		$old   = self::all();
 		$out   = $old;
 
-		$text = array( 'session_name', 'stripe_test_pk', 'stripe_live_pk', 'google_client_id' );
+		$text = array( 'session_name', 'stripe_test_pk', 'stripe_live_pk', 'google_client_id', 'topbar_text', 'topbar_button' );
 		foreach ( $text as $k ) {
 			if ( isset( $input[ $k ] ) ) {
 				$out[ $k ] = sanitize_text_field( wp_unslash( $input[ $k ] ) );
@@ -114,6 +117,9 @@ class Settings {
 					$out[ $k ] = $email;
 				}
 			}
+		}
+		if ( isset( $input['topbar_enabled'] ) ) {
+			$out['topbar_enabled'] = (int) (bool) (int) $input['topbar_enabled'];
 		}
 		if ( isset( $input['stripe_mode'] ) ) {
 			$out['stripe_mode'] = 'live' === $input['stripe_mode'] ? 'live' : 'test';

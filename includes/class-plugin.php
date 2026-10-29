@@ -28,6 +28,8 @@ class Plugin {
 		( new Meet_Service() )->init();
 		( new Trainer_Access() )->init();
 		( new Shortcode() )->init();
+		( new Rest_Config() )->init();
+		( new Topbar() )->init();
 		if ( is_admin() ) {
 			( new Admin_Menu() )->init();
 		}

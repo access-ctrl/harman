@@ -1,0 +1,87 @@
+/* Top bar and modal. Tokens mirror the Harman theme (purple #39074E, gold #EBC258, Manrope via inherit). */
+.fwh-sb-topbar {
+	position: relative;
+	z-index: 1000;
+	background: #39074e;
+	color: #fff;
+	font-family: inherit;
+	font-size: 14px;
+	line-height: 1.4;
+}
+.fwh-sb-topbar__inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 4px 16px;
+	max-width: 1320px;
+	margin: 0 auto;
+	padding: 6px 16px;
+	text-align: center;
+}
+.fwh-sb-topbar__text { margin: 0; font-size: 14px; font-weight: 600; color: #fff; }
+.fwh-sb-topbar__btn {
+	min-height: 44px;
+	padding: 6px 24px;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: #39074e;
+	background: #ebc258;
+	border: 0;
+	border-radius: 50px;
+	cursor: pointer;
+	transition: background-color .15s, color .15s;
+}
+.fwh-sb-topbar__btn:hover { background: #fff; color: #39074e; }
+.fwh-sb-topbar__btn:focus-visible,
+.fwh-sb-modal__close:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+html.fwh-sb-lock { overflow: hidden; }
+.fwh-sb-modal[hidden] { display: none !important; }
+.fwh-sb-modal { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: stretch; justify-content: center; }
+.fwh-sb-modal__backdrop { position: absolute; inset: 0; background: rgba(25, 0, 35, .6); }
+.fwh-sb-modal__panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	background: #fff;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	outline: none;
+}
+.fwh-sb-modal__head {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 8px 8px 8px 16px;
+	background: #fcf4ff;
+	border-bottom: 1px solid #d9c3e3;
+}
+.fwh-sb-modal__title { font-weight: 800; color: #39074e; font-size: 16px; }
+.fwh-sb-modal__close {
+	min-width: 44px;
+	min-height: 44px;
+	font-size: 28px;
+	line-height: 1;
+	color: #39074e;
+	background: transparent;
+	border: 0;
+	border-radius: 50%;
+	cursor: pointer;
+}
+.fwh-sb-modal__close:hover { background: #39074e; color: #fff; }
+.fwh-sb-modal .fwh-sb-wrap { margin: 0 auto; }
+
+@media (min-width: 700px) {
+	.fwh-sb-modal { align-items: center; padding: 24px; }
+	.fwh-sb-modal__panel { max-width: 780px; max-height: calc(100vh - 48px); border-radius: 20px; box-shadow: 0 20px 60px rgba(25, 0, 35, .35); }
+}
+@media (prefers-reduced-motion: reduce) { .fwh-sb-topbar__btn { transition: none; } }

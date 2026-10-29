@@ -71,6 +71,19 @@ class Admin_Settings {
 		$this->field( 'contact_email', __( 'Student contact email', 'fwh-speaking-booking' ), 'email' );
 		echo '</table>';
 
+		echo '<h2>' . esc_html__( 'Top bar', 'fwh-speaking-booking' ) . '</h2><table class="form-table" role="presentation"><tr><th scope="row">' . esc_html__( 'Show top bar', 'fwh-speaking-booking' ) . '</th><td>';
+		printf(
+			'<input type="hidden" name="%1$s[topbar_enabled]" value="0"><label><input type="checkbox" name="%1$s[topbar_enabled]" value="1" %2$s> %3$s</label><p class="description">%4$s</p>',
+			esc_attr( Settings::OPTION ),
+			checked( (int) $s['topbar_enabled'], 1, false ),
+			esc_html__( 'Show a strip at the top of every page with a button that opens the booking form', 'fwh-speaking-booking' ),
+			esc_html__( 'Needs the theme to call wp_body_open() right after the opening body tag (the Harman theme does).', 'fwh-speaking-booking' )
+		);
+		echo '</td></tr>';
+		$this->field( 'topbar_text', __( 'Strip text', 'fwh-speaking-booking' ) );
+		$this->field( 'topbar_button', __( 'Button label', 'fwh-speaking-booking' ) );
+		echo '</table>';
+
 		echo '<h2>Stripe</h2><table class="form-table" role="presentation"><tr><th scope="row">' . esc_html__( 'Mode', 'fwh-speaking-booking' ) . '</th><td>';
 		foreach ( array( 'test', 'live' ) as $mode ) {
 			printf(

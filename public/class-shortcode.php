@@ -30,12 +30,12 @@ class Shortcode {
 	public function maybe_prepare_page(): void {
 		if ( $this->page_has_shortcode() ) {
 			$this->no_cache();
-			$this->handle_cancel_return();
+			self::handle_cancel_return();
 		}
 	}
 
 	/** Customer came back from Stripe's "back" link: free the held slot immediately. */
-	private function handle_cancel_return(): void {
+	public static function handle_cancel_return(): void {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- the HMAC token below authorises this.
 		if ( isset( $_GET['fwh_sb_return'], $_GET['ref'], $_GET['tok'] ) && 'cancel' === $_GET['fwh_sb_return'] ) {
 			Bookings::cancel_from_return( sanitize_text_field( wp_unslash( $_GET['ref'] ) ), sanitize_text_field( wp_unslash( $_GET['tok'] ) ) );
@@ -67,10 +67,10 @@ class Shortcode {
 		$js  = FWH_SB_DIR . 'assets/booking.js';
 		wp_enqueue_style( 'fwh-sb-booking', FWH_SB_URL . 'assets/booking.css', array(), (string) filemtime( $css ) );
 		wp_enqueue_script( 'fwh-sb-booking', FWH_SB_URL . 'assets/booking.js', array(), (string) filemtime( $js ), true );
-		wp_add_inline_script( 'fwh-sb-booking', 'window.fwhSbConfig=' . wp_json_encode( $this->config() ) . ';', 'before' );
+		wp_add_inline_script( 'fwh-sb-booking', 'window.fwhSbConfig=' . wp_json_encode( self::config() ) . ';', 'before' );
 	}
 
-	private function config(): array {
+	public static function config(): array {
 		$today  = new \DateTimeImmutable( 'now', Time::toronto() );
 		$window = (int) Settings::get( 'booking_window_days' );
 		$last   = $today->modify( "+{$window} days" );

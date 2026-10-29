@@ -21,12 +21,14 @@
 		slot: null          // ISO string
 	};
 	var els = {};
+	var start = function () {};
 	var fmtCache = {};
 
 	function detectTz() {
 		var tz = '';
 		try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { tz = ''; }
 		tz = ALIASES[tz] || tz;
+		if (!cfg.timezones) { return 'America/Toronto'; } // Remote mode: the list arrives with the config.
 		return cfg.timezones.indexOf(tz) !== -1 ? tz : cfg.homeTz;
 	}
 
@@ -365,7 +367,7 @@
 			box.appendChild(el('p', null, msg));
 			if (restart) {
 				var b = el('button', { type: 'button', 'class': 'fwh-sb-submit' }, 'Choose another time');
-				b.addEventListener('click', function () { cleanUrl(); window.location.reload(); });
+				b.addEventListener('click', function () { cleanUrl(); if (cfg.remote) { main(); } else { window.location.reload(); } });
 				box.appendChild(b);
 			}
 		}
@@ -406,24 +408,48 @@
 		return { data: d };
 	}
 
-	var q = params();
-	if (q.fwh_sb_return === 'success' && q.ref && q.session_id) {
-		showReturn(q);
-		return;
-	}
-	build();
-	var cancelled = q.fwh_sb_return === 'cancel';
-	if (cancelled) { cleanUrl(); }
+	function main() {
+		var q = params();
+		if (q.fwh_sb_return === 'success' && q.ref && q.session_id) {
+			showReturn(q);
+			return;
+		}
+		state.slots = []; state.day = null; state.slot = null; state.monthKey = null;
+		build();
+		var cancelled = q.fwh_sb_return === 'cancel';
+		if (cancelled) { cleanUrl(); }
 
-	function start() {
-		showLoading('Loading available times\u2026');
-		loadSlots().then(function (slots) {
-			state.slots = slots;
-			render();
-			if (cancelled) {
-				els.status.textContent = 'Payment cancelled. Your time has been released; please choose a time again.';
-			}
-		}).catch(showLoadError);
+		start = function () {
+			showLoading('Loading available times\u2026');
+			loadSlots().then(function (slots) {
+				state.slots = slots;
+				render();
+				if (cancelled) {
+					els.status.textContent = 'Payment cancelled. Your time has been released; please choose a time again.';
+				}
+			}).catch(showLoadError);
+		};
+		start();
 	}
-	start();
+
+
+
+	if (cfg.remote) {
+		// Opened from the top bar: the page may be cached, so fetch fresh settings, nonce and dates.
+		clear(body);
+		body.appendChild(el('div', { 'class': 'fwh-sb-loading' }, null));
+		body.firstChild.appendChild(el('span', { 'class': 'fwh-sb-spinner', 'aria-hidden': 'true' }));
+		body.firstChild.appendChild(el('span', null, 'Loading\u2026'));
+		fetch(cfg.restUrl + 'config', { credentials: 'same-origin' })
+			.then(function (r) { if (!r.ok) { throw new Error('http ' + r.status); } return r.json(); })
+			.then(function (c) { Object.keys(c).forEach(function (k) { cfg[k] = c[k]; }); state.tz = detectTz(); main(); })
+			.catch(function () {
+				clear(body);
+				var box = el('div', { 'class': 'fwh-sb-errorbox', role: 'alert' });
+				box.appendChild(el('p', null, 'Sorry, booking is not available right now. Please try again later.'));
+				body.appendChild(box);
+			});
+	} else {
+		main();
+	}
 })();
