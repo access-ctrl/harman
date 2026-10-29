@@ -216,12 +216,100 @@
 			var v = readForm(form);
 			err.textContent = v.error || '';
 			if (v.error) { return; }
-			state.details = v.data;
-			// Booking submission is wired up in the next module.
-			err.textContent = 'Booking is not enabled yet.';
-			document.dispatchEvent(new CustomEvent('fwhSbReady', { detail: { start: state.slot, tz: state.tz, details: v.data } }));
+			submit.disabled = true;
+			submit.textContent = 'Please wait\u2026';
+			book(v.data).then(function (res) {
+				window.location.href = res.checkout_url;
+			}).catch(function (e) {
+				err.textContent = e.message;
+				submit.disabled = false;
+				submit.textContent = 'Continue to payment';
+				if (e.status === 409) { refreshSlots(); }
+			});
 		});
 		els.form.appendChild(form);
+	}
+
+	function book(d) {
+		var payload = {
+			start: state.slot, name: d.name, email: d.email, phone: d.phone,
+			student_tz: state.tz, website: d.website,
+			page_url: window.location.origin + window.location.pathname
+		};
+		return fetch(cfg.restUrl + 'book', {
+			method: 'POST', credentials: 'same-origin',
+			headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': cfg.nonce },
+			body: JSON.stringify(payload)
+		}).then(function (r) {
+			return r.json().catch(function () { return {}; }).then(function (j) {
+				if (!r.ok) {
+					var e = new Error(j && j.message ? j.message : 'Something went wrong. Please try again.');
+					e.status = r.status;
+					throw e;
+				}
+				return j;
+			});
+		});
+	}
+
+	function refreshSlots() {
+		state.slot = null;
+		loadSlots().then(function (slots) { state.slots = slots; render(); }).catch(function () {});
+	}
+
+	function params() {
+		var out = {};
+		window.location.search.replace(/^\?/, '').split('&').forEach(function (kv) {
+			var p = kv.split('=');
+			if (p[0]) { out[decodeURIComponent(p[0])] = decodeURIComponent((p[1] || '').replace(/\+/g, ' ')); }
+		});
+		return out;
+	}
+
+	function cleanUrl() {
+		try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { /* ignore */ }
+	}
+
+	function showReturn(q) {
+		clear(body);
+		var box = el('div', { 'class': 'fwh-sb-return', role: 'status' });
+		body.appendChild(box);
+		var started = Date.now();
+		box.appendChild(el('h3', null, 'Confirming your payment'));
+		box.appendChild(el('p', null, 'Please keep this page open\u2026'));
+
+		function done(title, msg, restart) {
+			clear(box);
+			box.appendChild(el('h3', null, title));
+			box.appendChild(el('p', null, msg));
+			if (restart) {
+				var b = el('button', { type: 'button', 'class': 'fwh-sb-submit' }, 'Choose another time');
+				b.addEventListener('click', function () { cleanUrl(); window.location.reload(); });
+				box.appendChild(b);
+			}
+		}
+		function poll() {
+			api('booking-status?ref=' + encodeURIComponent(q.ref) + '&session_id=' + encodeURIComponent(q.session_id)).then(function (res) {
+				if (res.status === 'paid') {
+					var tz = res.student_tz || state.tz;
+					done('Payment received', 'Your session is booked for ' + longLabel(res.start, tz) + ' (' + tz.replace(/_/g, ' ') + '). Booking reference ' + q.ref + '. We are sending your confirmation email with the meeting link.', false);
+					return;
+				}
+				if (res.status === 'expired' || res.status === 'cancelled') {
+					done('Payment not completed', 'Your payment was not completed and the time has been released.', true);
+					return;
+				}
+				next();
+			}).catch(next);
+		}
+		function next() {
+			if (Date.now() - started > 120000) {
+				done('Still confirming', 'We have not received confirmation yet. If you paid, you will get an email shortly' + (cfg.contactEmail ? '; otherwise contact ' + cfg.contactEmail + ' quoting ' + q.ref : '') + '.', false);
+				return;
+			}
+			window.setTimeout(poll, 3000);
+		}
+		poll();
 	}
 
 	function readForm(form) {
@@ -237,11 +325,23 @@
 		return { data: d };
 	}
 
+	var q = params();
+	if (q.fwh_sb_return === 'success' && q.ref && q.session_id) {
+		showReturn(q);
+		return;
+	}
 	build();
-	els.status.textContent = 'Loading available times…';
+	if (q.fwh_sb_return === 'cancel') {
+		els.status.textContent = 'Payment cancelled. Your time has been released; please choose a time again.';
+		cleanUrl();
+	} else {
+		els.status.textContent = 'Loading available times\u2026';
+	}
 	loadSlots().then(function (slots) {
 		state.slots = slots;
+		var msg = els.status.textContent;
 		render();
+		if (q.fwh_sb_return === 'cancel') { els.status.textContent = msg; }
 	}).catch(function () {
 		els.status.textContent = 'Sorry, we could not load available times. Please refresh the page and try again.';
 	});

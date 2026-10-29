@@ -12,6 +12,6 @@ defined( 'ABSPATH' ) || exit;
 class Deactivator {
 
 	public static function deactivate(): void {
-		// Nothing to clean up yet.
+		Cron::clear();
 	}
 }

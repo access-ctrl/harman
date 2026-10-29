@@ -30,7 +30,17 @@ class Shortcode {
 	public function maybe_prepare_page(): void {
 		if ( $this->page_has_shortcode() ) {
 			$this->no_cache();
+			$this->handle_cancel_return();
 		}
+	}
+
+	/** Customer came back from Stripe's "back" link: free the held slot immediately. */
+	private function handle_cancel_return(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- the HMAC token below authorises this.
+		if ( isset( $_GET['fwh_sb_return'], $_GET['ref'], $_GET['tok'] ) && 'cancel' === $_GET['fwh_sb_return'] ) {
+			Bookings::cancel_from_return( sanitize_text_field( wp_unslash( $_GET['ref'] ) ), sanitize_text_field( wp_unslash( $_GET['tok'] ) ) );
+		}
+		// phpcs:enable
 	}
 
 	private function no_cache(): void {
@@ -74,6 +84,7 @@ class Shortcode {
 			'to'       => $last->format( 'Y-m-d' ),
 			'timezones' => timezone_identifiers_list(),
 			'homeTz'   => 'America/Toronto',
+			'contactEmail' => (string) Settings::get( 'contact_email' ),
 		);
 	}
 

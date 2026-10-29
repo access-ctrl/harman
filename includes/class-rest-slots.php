@@ -44,7 +44,7 @@ class Rest_Slots {
 	public function handle( \WP_REST_Request $request ) {
 		nocache_headers();
 
-		if ( ! $this->allow_request() ) {
+		if ( ! Rate_Limit::allow( 'slots', self::RATE_LIMIT, self::RATE_WINDOW ) ) {
 			return new \WP_Error( 'fwh_sb_rate_limited', __( 'Too many requests. Please wait a moment.', 'fwh-speaking-booking' ), array( 'status' => 429 ) );
 		}
 
@@ -66,31 +66,5 @@ class Rest_Slots {
 		);
 		$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0' );
 		return $response;
-	}
-
-	/**
-	 * Per-IP counter in a transient. CF-Connecting-IP is used when present because the
-	 * site sits behind Cloudflare; spoofing it only lets a client dodge its own limit.
-	 */
-	private function allow_request(): bool {
-		$ip = '';
-		foreach ( array( 'HTTP_CF_CONNECTING_IP', 'REMOTE_ADDR' ) as $key ) {
-			if ( ! empty( $_SERVER[ $key ] ) ) {
-				$candidate = sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) );
-				if ( filter_var( $candidate, FILTER_VALIDATE_IP ) ) {
-					$ip = $candidate;
-					break;
-				}
-			}
-		}
-		$key   = 'fwh_sb_rl_' . md5( $ip );
-		$state = get_transient( $key );
-		$now   = time();
-		if ( ! is_array( $state ) || $state[1] <= $now ) {
-			$state = array( 0, $now + self::RATE_WINDOW );
-		}
-		++$state[0];
-		set_transient( $key, $state, max( 1, $state[1] - $now ) );
-		return $state[0] <= self::RATE_LIMIT;
 	}
 }

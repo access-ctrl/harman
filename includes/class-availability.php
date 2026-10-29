@@ -146,13 +146,17 @@ class Availability {
 	}
 
 	/**
-	 * Trainer IDs free at an exact UTC start ('Y-m-d H:i:s'), ignoring nothing (limits apply).
+	 * Trainer IDs free at an exact UTC start ('Y-m-d H:i:s'). Booking window and minimum
+	 * notice apply unless $ignore_limits (used when a late payment is reconciled).
 	 *
 	 * @return int[]
 	 */
-	public static function trainers_free_at( string $start_utc, int $trainer_id = 0 ): array {
+	public static function trainers_free_at( string $start_utc, int $trainer_id = 0, bool $ignore_limits = false ): array {
 		$date = Time::utc_to_toronto( $start_utc, 'Y-m-d' );
-		$opts = $trainer_id ? array( 'trainer_id' => $trainer_id ) : array();
+		$opts = array( 'ignore_limits' => $ignore_limits );
+		if ( $trainer_id ) {
+			$opts['trainer_id'] = $trainer_id;
+		}
 		$all  = self::compute( $date, $date, $opts );
 		return $all[ $date ][ $start_utc ] ?? array();
 	}
