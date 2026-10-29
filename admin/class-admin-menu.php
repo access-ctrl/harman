@@ -15,12 +15,15 @@ class Admin_Menu {
 	private Admin_Trainers $trainers;
 	private Admin_Blocks $blocks;
 	private Admin_Diagnostics $diagnostics;
+	private Admin_Google $google;
 
 	public function init(): void {
 		$this->settings = new Admin_Settings();
 		$this->trainers = new Admin_Trainers();
 		$this->blocks   = new Admin_Blocks();
 		$this->diagnostics = new Admin_Diagnostics();
+		$this->google      = new Admin_Google();
+		$this->google->init();
 		$this->settings->init();
 		$this->trainers->init();
 		$this->blocks->init();

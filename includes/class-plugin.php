@@ -25,6 +25,7 @@ class Plugin {
 		( new Rest_Slots() )->init();
 		( new Rest_Booking() )->init();
 		( new Cron() )->init();
+		( new Meet_Service() )->init();
 		( new Shortcode() )->init();
 		if ( is_admin() ) {
 			( new Admin_Menu() )->init();

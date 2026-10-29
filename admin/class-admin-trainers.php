@@ -252,6 +252,8 @@ class Admin_Trainers {
 		echo '</form>';
 
 		if ( $t ) {
+			echo '<h2>' . esc_html__( 'Google Calendar and Meet', 'fwh-speaking-booking' ) . '</h2>';
+			Admin_Google::connection_box( $id );
 			echo '<h2>' . esc_html__( 'Login', 'fwh-speaking-booking' ) . '</h2>';
 			if ( $t->user_id && get_userdata( (int) $t->user_id ) ) {
 				echo '<p>' . esc_html__( 'This trainer has a WordPress login.', 'fwh-speaking-booking' ) . '</p>';

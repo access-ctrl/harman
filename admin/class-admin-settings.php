@@ -99,7 +99,14 @@ class Admin_Settings {
 		$this->field( 'google_client_secret', __( 'OAuth client secret', 'fwh-speaking-booking' ) );
 		echo '</table>';
 
+		echo '<p>' . esc_html__( 'Redirect URI to add in Google Cloud (Authorized redirect URIs):', 'fwh-speaking-booking' ) . ' <code>' . esc_html( Google_Client::redirect_uri() ) . '</code></p>';
+
 		submit_button();
-		echo '</form></div>';
+		echo '</form>';
+
+		echo '<h2>' . esc_html__( 'Fallback Google account', 'fwh-speaking-booking' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'Used to create the Meet event when a trainer has not connected their own account. Save the client ID and secret above first.', 'fwh-speaking-booking' ) . '</p>';
+		Admin_Google::connection_box( 0 );
+		echo '</div>';
 	}
 }
