@@ -58,7 +58,7 @@ class Google_Client {
 		$args['timeout'] = 20;
 		$res             = wp_remote_request( $url, $args );
 		if ( is_wp_error( $res ) ) {
-			error_log( '[fwh-sb] Google request failed: ' . $res->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Google request failed: ' . $res->get_error_message() );
 			return new \WP_Error( 'fwh_sb_google_http', 'Google request failed.' );
 		}
 		$code = (int) wp_remote_retrieve_response_code( $res );
@@ -66,7 +66,7 @@ class Google_Client {
 		$data = '' === $raw ? array() : json_decode( $raw, true );
 		if ( $code >= 400 || ! is_array( $data ) ) {
 			$err = is_array( $data ) && isset( $data['error'] ) ? ( is_array( $data['error'] ) ? (string) ( $data['error']['message'] ?? 'error' ) : (string) $data['error'] ) : 'error';
-			error_log( '[fwh-sb] Google API ' . $code . ' on ' . $method . ' ' . wp_parse_url( $url, PHP_URL_PATH ) . ': ' . $err ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Google API ' . $code . ' on ' . $method . ' ' . wp_parse_url( $url, PHP_URL_PATH ) . ': ' . $err );
 			return new \WP_Error( 'fwh_sb_google_api', 'Google API error.', array( 'http' => $code, 'error' => is_array( $data ) && isset( $data['error'] ) && is_string( $data['error'] ) ? $data['error'] : '' ) );
 		}
 		return $data;

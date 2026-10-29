@@ -66,7 +66,7 @@ class Settings {
 	}
 
 	public static function sanitize( $input ): array {
-		$input = is_array( $input ) ? $input : array();
+		$input = is_array( $input ) ? array_filter( $input, 'is_scalar' ) : array(); // Ignore array-valued fields.
 		$old   = self::all();
 		$out   = $old;
 

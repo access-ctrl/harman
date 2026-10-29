@@ -184,7 +184,7 @@ class Rest_Booking {
 		} catch ( \Throwable $e ) {
 			// Let Stripe retry: forget the event so it is processed next time.
 			$wpdb->delete( $table, array( 'event_id' => $id ), array( '%s' ) );
-			error_log( '[fwh-sb] Webhook processing failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Webhook processing failed: ' . $e->getMessage() );
 			return $this->error( 'fwh_sb_error', 'Processing failed.', 500 );
 		}
 		return new \WP_REST_Response( array( 'received' => true ) );

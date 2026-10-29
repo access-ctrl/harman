@@ -31,6 +31,9 @@ class Hours_Input {
 	public static function parse( array $days, array $starts, array $ends ) {
 		$rows = array();
 		foreach ( $days as $i => $day ) {
+			if ( ! is_scalar( $day ) || ( isset( $starts[ $i ] ) && ! is_scalar( $starts[ $i ] ) ) || ( isset( $ends[ $i ] ) && ! is_scalar( $ends[ $i ] ) ) ) {
+				return __( 'Invalid hours submitted.', 'fwh-speaking-booking' );
+			}
 			$day   = (int) $day;
 			$start = isset( $starts[ $i ] ) ? sanitize_text_field( (string) $starts[ $i ] ) : '';
 			$end   = isset( $ends[ $i ] ) ? sanitize_text_field( (string) $ends[ $i ] ) : '';

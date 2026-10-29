@@ -292,6 +292,9 @@
 			submit.disabled = true;
 			submit.textContent = 'Please wait\u2026';
 			book(v.data).then(function (res) {
+				if (!res || typeof res.checkout_url !== 'string' || res.checkout_url.indexOf('https://') !== 0) {
+					throw new Error('We could not start the payment. Please try again.');
+				}
 				window.location.href = res.checkout_url;
 			}).catch(function (e) {
 				err.textContent = e.message;

@@ -106,7 +106,7 @@ class Admin_Trainers {
 			)
 		);
 		if ( is_wp_error( $user_id ) ) {
-			error_log( '[fwh-sb] create login failed: ' . $user_id->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'create login failed: ' . $user_id->get_error_message() );
 			Notice::add( 'error', __( 'Could not create the login.', 'fwh-speaking-booking' ) );
 			Notice::redirect( self::PAGE, $back );
 		}

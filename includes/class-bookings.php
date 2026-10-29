@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 class Bookings {
 
 	public const HOLD_MINUTES    = 35;
+	public const MAX_LIVE_HOLDS  = 3;
 	// Stripe requires expires_at to be at least 30 minutes after creation, so we ask for 31
 	// to survive request latency. It is still shorter than the 35 minute hold.
 	public const CHECKOUT_SECONDS = 1860;
@@ -57,8 +58,15 @@ class Bookings {
 
 		$amount = Settings::price_minor();
 		if ( $amount <= 0 || ! Stripe_Client::configured() ) {
-			error_log( '[fwh-sb] Booking attempted but price or Stripe key is not configured.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Booking attempted but price or Stripe key is not configured.' );
 			return new \WP_Error( 'fwh_sb_unavailable', __( 'Booking is temporarily unavailable. Please try again later.', 'fwh-speaking-booking' ), array( 'status' => 503 ) );
+		}
+
+		// Stop one person from tying up many slots with unpaid holds.
+		$t_b = self::t();
+		$live = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$t_b} WHERE student_email = %s AND status = 'held' AND hold_expires_utc > %s", $d['email'], Time::now_utc() ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $live >= self::MAX_LIVE_HOLDS ) {
+			return new \WP_Error( 'fwh_sb_too_many', __( 'You already have bookings waiting for payment. Please complete or cancel them first, or try again in a few minutes.', 'fwh-speaking-booking' ), array( 'status' => 429 ) );
 		}
 
 		$taken = new \WP_Error( 'fwh_sb_taken', __( 'That time was just taken, please pick another', 'fwh-speaking-booking' ), array( 'status' => 409 ) );
@@ -236,7 +244,7 @@ class Bookings {
 		}
 
 		self::update( $id, array( 'stripe_payment_intent' => $payment_intent ) );
-		error_log( '[fwh-sb] Paid booking ' . $b->ref . ' could not be confirmed: slot no longer free.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		Log::error( 'Paid booking ' . $b->ref . ' could not be confirmed: slot no longer free.' );
 		Notify::coordinator(
 			'Refund needed for ' . $b->ref,
 			"A payment arrived for booking {$b->ref} but the slot is no longer available.\n\nStudent: {$b->student_name} <{$b->student_email}>\nPayment intent: {$payment_intent}\n\nPlease refund this payment in the Stripe dashboard."
@@ -259,11 +267,11 @@ class Bookings {
 		$ref = isset( $session['client_reference_id'] ) ? (string) $session['client_reference_id'] : '';
 		$b   = '' !== $ref ? self::get_by_ref( $ref ) : null;
 		if ( ! $b ) {
-			error_log( '[fwh-sb] Paid session for unknown booking reference.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Paid session for unknown booking reference.' );
 			return 'missing';
 		}
 		if ( empty( $b->stripe_session_id ) || ( $session['id'] ?? '' ) !== $b->stripe_session_id || ! self::session_matches( $b, $session ) ) {
-			error_log( '[fwh-sb] Paid session does not match booking ' . $b->ref . ' (session, amount or currency).' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Paid session does not match booking ' . $b->ref . ' (session, amount or currency).' );
 			Notify::coordinator( 'Payment mismatch for ' . $b->ref, "A paid Checkout Session did not match booking {$b->ref} (session, amount or currency). Please check Stripe." );
 			return 'mismatch';
 		}
@@ -354,7 +362,7 @@ class Bookings {
 				$data = $res->get_error_data();
 				$http = is_array( $data ) ? (int) ( $data['http'] ?? 0 ) : 0;
 				if ( ! in_array( $http, array( 404, 410 ), true ) ) { // Already gone counts as deleted.
-					error_log( '[fwh-sb] Could not delete calendar event for ' . $b->ref ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					Log::error( 'Could not delete calendar event for ' . $b->ref );
 					return 'cancelled_event_failed';
 				}
 			}

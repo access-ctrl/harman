@@ -49,14 +49,14 @@ class Stripe_Client {
 		}
 		$res = wp_remote_request( self::API . $path, $args );
 		if ( is_wp_error( $res ) ) {
-			error_log( '[fwh-sb] Stripe request failed: ' . $res->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Stripe request failed: ' . $res->get_error_message() );
 			return new \WP_Error( 'fwh_sb_stripe_http', 'Stripe request failed.' );
 		}
 		$code = (int) wp_remote_retrieve_response_code( $res );
 		$data = json_decode( wp_remote_retrieve_body( $res ), true );
 		if ( $code >= 400 || ! is_array( $data ) ) {
 			$msg = is_array( $data ) && isset( $data['error']['message'] ) ? (string) $data['error']['message'] : 'unknown error';
-			error_log( '[fwh-sb] Stripe API ' . $code . ' on ' . $method . ' ' . $path . ': ' . $msg ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Log::error( 'Stripe API ' . $code . ' on ' . $method . ' ' . $path . ': ' . $msg );
 			return new \WP_Error( 'fwh_sb_stripe_api', 'Stripe API error.', array( 'http' => $code ) );
 		}
 		return $data;

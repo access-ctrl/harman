@@ -155,7 +155,7 @@ class Meet_Service {
 	}
 
 	private static function handle_failure( object $b, int $attempts, string $reason ): void {
-		error_log( sprintf( '[fwh-sb] Meet attempt %d for %s failed: %s', $attempts, $b->ref, $reason ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		Log::error( sprintf( 'Meet attempt %d for %s failed: %s', $attempts, $b->ref, $reason ) );
 		if ( $attempts <= count( self::RETRY_DELAYS ) ) {
 			wp_schedule_single_event( time() + self::RETRY_DELAYS[ $attempts - 1 ], self::RETRY_HOOK, array( (int) $b->id ) );
 			return;

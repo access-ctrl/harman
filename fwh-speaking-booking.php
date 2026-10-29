@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FWH Speaking Booking
  * Description: 20-minute 1-to-1 French speaking session booking for frenchwithharman.com.
- * Version: 0.1.0
+ * Version: 1.0.0
  * Requires PHP: 8.0
  * Requires at least: 6.0
  * Text Domain: fwh-speaking-booking
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'FWH_SB_VERSION', '0.1.0' );
+define( 'FWH_SB_VERSION', '1.0.0' );
 define( 'FWH_SB_FILE', __FILE__ );
 define( 'FWH_SB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FWH_SB_URL', plugin_dir_url( __FILE__ ) );
