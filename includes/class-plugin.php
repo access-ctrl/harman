@@ -22,6 +22,8 @@ class Plugin {
 
 	public function init(): void {
 		Schema::maybe_upgrade();
+		( new Rest_Slots() )->init();
+		( new Shortcode() )->init();
 		if ( is_admin() ) {
 			( new Admin_Menu() )->init();
 		}

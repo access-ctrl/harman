@@ -14,11 +14,13 @@ class Admin_Menu {
 	private Admin_Settings $settings;
 	private Admin_Trainers $trainers;
 	private Admin_Blocks $blocks;
+	private Admin_Diagnostics $diagnostics;
 
 	public function init(): void {
 		$this->settings = new Admin_Settings();
 		$this->trainers = new Admin_Trainers();
 		$this->blocks   = new Admin_Blocks();
+		$this->diagnostics = new Admin_Diagnostics();
 		$this->settings->init();
 		$this->trainers->init();
 		$this->blocks->init();
@@ -38,5 +40,6 @@ class Admin_Menu {
 		add_submenu_page( 'fwh-sb', __( 'Settings', 'fwh-speaking-booking' ), __( 'Settings', 'fwh-speaking-booking' ), 'fwh_sb_manage', 'fwh-sb', array( $this->settings, 'render' ) );
 		add_submenu_page( 'fwh-sb', __( 'Trainers', 'fwh-speaking-booking' ), __( 'Trainers', 'fwh-speaking-booking' ), 'fwh_sb_manage', 'fwh-sb-trainers', array( $this->trainers, 'render' ) );
 		add_submenu_page( 'fwh-sb', __( 'Blocks', 'fwh-speaking-booking' ), __( 'Blocks', 'fwh-speaking-booking' ), 'fwh_sb_manage', 'fwh-sb-blocks', array( $this->blocks, 'render' ) );
+		add_submenu_page( 'fwh-sb', __( 'Diagnostics', 'fwh-speaking-booking' ), __( 'Diagnostics', 'fwh-speaking-booking' ), 'fwh_sb_manage', 'fwh-sb-diagnostics', array( $this->diagnostics, 'render' ) );
 	}
 }

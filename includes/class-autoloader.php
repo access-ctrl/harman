@@ -1,6 +1,6 @@
 <?php
 /**
- * PSR-style autoloader mapping FWH\SpeakingBooking\Foo_Bar to includes/class-foo-bar.php.
+ * PSR-style autoloader mapping FWH\SpeakingBooking\Foo_Bar to includes/class-foo-bar.php (then /admin and /public).
  *
  * @package FWH\SpeakingBooking
  */
@@ -28,9 +28,12 @@ class Autoloader {
 			require_once $path;
 			return;
 		}
-		$path = FWH_SB_DIR . 'admin/' . $file;
-		if ( is_readable( $path ) ) {
-			require_once $path;
+		foreach ( array( 'admin', 'public' ) as $dir ) {
+			$path = FWH_SB_DIR . $dir . '/' . $file;
+			if ( is_readable( $path ) ) {
+				require_once $path;
+				return;
+			}
 		}
 	}
 }
