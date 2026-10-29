@@ -46,6 +46,15 @@
 		return fmt('l', tz, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
 	}
 
+	function money() {
+		if (!(cfg.price > 0)) { return ''; }
+		try {
+			return new Intl.NumberFormat(undefined, { style: 'currency', currency: cfg.currency }).format(cfg.price);
+		} catch (e) {
+			return cfg.price.toFixed(2) + ' ' + cfg.currency;
+		}
+	}
+
 	function el(tag, attrs, text) {
 		var n = document.createElement(tag);
 		if (attrs) { Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); }); }
@@ -109,6 +118,29 @@
 		[els.status, els.cal, els.slots, els.form].forEach(function (n) { body.appendChild(n); });
 	}
 
+	function showLoading(msg) {
+		clear(els.cal); clear(els.slots); clear(els.form);
+		els.status.textContent = '';
+		var box = el('div', { 'class': 'fwh-sb-loading' });
+		box.appendChild(el('span', { 'class': 'fwh-sb-spinner', 'aria-hidden': 'true' }));
+		box.appendChild(el('span', null, msg));
+		els.cal.appendChild(box);
+		body.setAttribute('aria-busy', 'true');
+	}
+
+	function showLoadError() {
+		body.removeAttribute('aria-busy');
+		clear(els.cal); clear(els.slots); clear(els.form);
+		els.status.textContent = '';
+		var box = el('div', { 'class': 'fwh-sb-errorbox', role: 'alert' });
+		box.appendChild(el('p', null, 'Sorry, we could not load the available times.'));
+		var retry = el('button', { type: 'button', 'class': 'fwh-sb-secondary' }, 'Try again');
+		retry.addEventListener('click', start);
+		box.appendChild(retry);
+		els.cal.appendChild(box);
+		retry.focus();
+	}
+
 	function slotsByDay() {
 		var map = {};
 		state.slots.forEach(function (iso) {
@@ -119,6 +151,7 @@
 	}
 
 	function render() {
+		body.removeAttribute('aria-busy');
 		var map = slotsByDay();
 		var days = Object.keys(map).sort();
 		clear(els.cal); clear(els.slots); clear(els.form);
@@ -154,19 +187,48 @@
 		var offset = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
 		for (var i = 0; i < offset; i++) { grid.appendChild(el('span')); }
 		var count = new Date(Date.UTC(y, m, 0)).getUTCDate();
+		var enabled = [];
 		for (var d = 1; d <= count; d++) {
 			var key = state.monthKey + '-' + (d < 10 ? '0' + d : d);
 			var has = !!map[key];
-			var b = el('button', { type: 'button', 'class': 'fwh-sb-day' + (key === state.day ? ' is-selected' : ''), 'data-day': key }, String(d));
+			var b = el('button', { type: 'button', 'class': 'fwh-sb-day' + (key === state.day ? ' is-selected' : '') + (key === todayKey() ? ' is-today' : ''), 'data-day': key }, String(d));
 			b.disabled = !has;
 			if (has) {
 				b.setAttribute('aria-label', new Intl.DateTimeFormat(undefined, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d))) + ', times available');
 				b.setAttribute('aria-pressed', key === state.day ? 'true' : 'false');
+				b.setAttribute('tabindex', '-1');
 				b.addEventListener('click', onDay);
+				b.addEventListener('keydown', onDayKey);
+				enabled.push(b);
 			}
 			grid.appendChild(b);
 		}
+		// Roving tabindex: one tab stop for the whole grid, arrow keys move inside it.
+		var stop = enabled.filter(function (n) { return n.getAttribute('data-day') === state.day; })[0] || enabled[0];
+		if (stop) { stop.setAttribute('tabindex', '0'); }
 		els.cal.appendChild(grid);
+	}
+
+	function todayKey() { return dayKey(new Date().toISOString(), state.tz); }
+
+	function onDayKey(ev) {
+		var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[ev.key];
+		if (!step) { return; }
+		var days = Array.prototype.slice.call(els.cal.querySelectorAll('.fwh-sb-day:not(:disabled)'));
+		var all = Array.prototype.slice.call(els.cal.querySelectorAll('.fwh-sb-day'));
+		var from = all.indexOf(ev.currentTarget);
+		var target = null;
+		if (Math.abs(step) === 1) {
+			target = days[days.indexOf(ev.currentTarget) + step];
+		} else if (all[from + step] && !all[from + step].disabled) {
+			target = all[from + step];
+		}
+		if (target) {
+			ev.preventDefault();
+			ev.currentTarget.setAttribute('tabindex', '-1');
+			target.setAttribute('tabindex', '0');
+			target.focus();
+		}
 	}
 
 	function onDay(ev) {
@@ -179,8 +241,11 @@
 
 	function renderSlots(list) {
 		els.slots.appendChild(el('h3', null, 'Available times'));
-		els.slots.appendChild(el('p', { 'class': 'fwh-sb-note' }, cfg.duration + ' minutes · times shown in ' + state.tz.replace(/_/g, ' ')));
-		var wrap = el('div', { 'class': 'fwh-sb-slotlist' });
+		var parts = [cfg.duration + ' minutes'];
+		if (money()) { parts.push(money()); }
+		parts.push('times shown in ' + state.tz.replace(/_/g, ' '));
+		els.slots.appendChild(el('p', { 'class': 'fwh-sb-note' }, parts.join(' · ')));
+		var wrap = el('div', { 'class': 'fwh-sb-slotlist', role: 'group', 'aria-label': 'Available times' });
 		list.forEach(function (iso) {
 			var b = el('button', { type: 'button', 'class': 'fwh-sb-slot' + (iso === state.slot ? ' is-selected' : ''), 'aria-pressed': iso === state.slot ? 'true' : 'false' }, timeLabel(iso, state.tz));
 			b.addEventListener('click', function () { state.slot = iso; render(); var f = els.form.querySelector('input'); if (f) { f.focus(); } });
@@ -189,33 +254,41 @@
 		els.slots.appendChild(wrap);
 	}
 
-	function field(id, label, type, extra) {
+	function field(id, label, type, extra, hint) {
 		var wrap = el('p', { 'class': 'fwh-sb-field' });
-		wrap.appendChild(el('label', { 'for': id }, label));
-		var input = el('input', Object.assign({ id: id, name: id, type: type, required: 'required' }, extra || {}));
-		wrap.appendChild(input);
+		wrap.appendChild(el('label', { 'for': id }, label + ' *'));
+		var attrs = Object.assign({ id: id, name: id, type: type, required: 'required', 'aria-required': 'true' }, extra || {});
+		if (hint) { attrs['aria-describedby'] = id + '-hint'; }
+		wrap.appendChild(el('input', attrs));
+		if (hint) { wrap.appendChild(el('span', { 'class': 'fwh-sb-hint', id: id + '-hint' }, hint)); }
 		return wrap;
 	}
 
 	function renderForm() {
 		els.form.appendChild(el('h3', null, 'Your details'));
-		els.form.appendChild(el('p', { 'class': 'fwh-sb-summary' }, longLabel(state.slot, state.tz) + ' (' + state.tz.replace(/_/g, ' ') + ')'));
+		els.form.appendChild(el('p', { 'class': 'fwh-sb-summary' }, longLabel(state.slot, state.tz) + ' (' + state.tz.replace(/_/g, ' ') + ') \u00B7 ' + cfg.duration + ' min' + (money() ? ' \u00B7 ' + money() : '')));
 		var form = el('form', { novalidate: 'novalidate' });
 		form.appendChild(field('fwh-sb-name', 'Full name', 'text', { autocomplete: 'name', maxlength: '190' }));
 		form.appendChild(field('fwh-sb-email', 'Email', 'email', { autocomplete: 'email', maxlength: '190' }));
-		form.appendChild(field('fwh-sb-phone', 'Phone with country code', 'tel', { autocomplete: 'tel', placeholder: '+1 416 555 0123', maxlength: '25' }));
+		form.appendChild(field('fwh-sb-phone', 'Phone with country code', 'tel', { autocomplete: 'tel', placeholder: '+1 416 555 0123', maxlength: '25' }, 'Start with + and your country code, e.g. +91 98765 43210'));
 		var hp = el('p', { 'class': 'fwh-sb-hp', 'aria-hidden': 'true' });
 		hp.appendChild(el('label', { 'for': 'fwh-sb-website' }, 'Leave this field empty'));
 		hp.appendChild(el('input', { id: 'fwh-sb-website', name: 'website', type: 'text', tabindex: '-1', autocomplete: 'off' }));
 		form.appendChild(hp);
-		var err = el('p', { 'class': 'fwh-sb-error', role: 'alert' });
+		var err = el('p', { 'class': 'fwh-sb-error', role: 'alert', id: 'fwh-sb-error' });
 		var submit = el('button', { type: 'submit', 'class': 'fwh-sb-submit' }, 'Continue to payment');
 		form.appendChild(err); form.appendChild(submit);
+		form.appendChild(el('p', { 'class': 'fwh-sb-hint' }, 'You will pay securely by card on the next page (Stripe). Your time is held for a few minutes while you pay.'));
 		form.addEventListener('submit', function (ev) {
 			ev.preventDefault();
 			var v = readForm(form);
+			Array.prototype.forEach.call(form.querySelectorAll('input'), function (i) { i.removeAttribute('aria-invalid'); });
 			err.textContent = v.error || '';
-			if (v.error) { return; }
+			if (v.error) {
+				var bad = form.elements[v.field];
+				if (bad) { bad.setAttribute('aria-invalid', 'true'); bad.focus(); }
+				return;
+			}
 			submit.disabled = true;
 			submit.textContent = 'Please wait\u2026';
 			book(v.data).then(function (res) {
@@ -224,7 +297,7 @@
 				err.textContent = e.message;
 				submit.disabled = false;
 				submit.textContent = 'Continue to payment';
-				if (e.status === 409) { refreshSlots(); }
+				if (e.status === 409) { refreshSlots(e.message); }
 			});
 		});
 		els.form.appendChild(form);
@@ -252,9 +325,13 @@
 		});
 	}
 
-	function refreshSlots() {
+	function refreshSlots(message) {
 		state.slot = null;
-		loadSlots().then(function (slots) { state.slots = slots; render(); }).catch(function () {});
+		loadSlots().then(function (slots) {
+			state.slots = slots;
+			render();
+			if (message) { els.status.textContent = message; }
+		}).catch(function () {});
 	}
 
 	function params() {
@@ -275,6 +352,7 @@
 		var box = el('div', { 'class': 'fwh-sb-return', role: 'status' });
 		body.appendChild(box);
 		var started = Date.now();
+		box.appendChild(el('span', { 'class': 'fwh-sb-spinner', 'aria-hidden': 'true' }));
 		box.appendChild(el('h3', null, 'Confirming your payment'));
 		box.appendChild(el('p', null, 'Please keep this page open\u2026'));
 
@@ -319,9 +397,9 @@
 			phone: form.elements['fwh-sb-phone'].value.trim(),
 			website: form.elements['website'].value
 		};
-		if (!d.name) { return { error: 'Please enter your name.' }; }
-		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) { return { error: 'Please enter a valid email address.' }; }
-		if (!/^\+\d[\d\s\-()]{6,19}$/.test(d.phone)) { return { error: 'Please enter your phone number starting with the country code, e.g. +1 416 555 0123.' }; }
+		if (!d.name) { return { error: 'Please enter your name.', field: 'fwh-sb-name' }; }
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) { return { error: 'Please enter a valid email address.', field: 'fwh-sb-email' }; }
+		if (!/^\+\d[\d\s\-()]{6,19}$/.test(d.phone)) { return { error: 'Please enter your phone number starting with the country code, e.g. +1 416 555 0123.', field: 'fwh-sb-phone' }; }
 		return { data: d };
 	}
 
@@ -331,18 +409,18 @@
 		return;
 	}
 	build();
-	if (q.fwh_sb_return === 'cancel') {
-		els.status.textContent = 'Payment cancelled. Your time has been released; please choose a time again.';
-		cleanUrl();
-	} else {
-		els.status.textContent = 'Loading available times\u2026';
+	var cancelled = q.fwh_sb_return === 'cancel';
+	if (cancelled) { cleanUrl(); }
+
+	function start() {
+		showLoading('Loading available times\u2026');
+		loadSlots().then(function (slots) {
+			state.slots = slots;
+			render();
+			if (cancelled) {
+				els.status.textContent = 'Payment cancelled. Your time has been released; please choose a time again.';
+			}
+		}).catch(showLoadError);
 	}
-	loadSlots().then(function (slots) {
-		state.slots = slots;
-		var msg = els.status.textContent;
-		render();
-		if (q.fwh_sb_return === 'cancel') { els.status.textContent = msg; }
-	}).catch(function () {
-		els.status.textContent = 'Sorry, we could not load available times. Please refresh the page and try again.';
-	});
+	start();
 })();
