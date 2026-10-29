@@ -92,8 +92,8 @@ class Settings {
 		$formats = array(
 			'stripe_test_sk'    => array( '/^(sk|rk)_test_[A-Za-z0-9]{16,}$/', 'a Stripe test secret key (starts with sk_test_)' ),
 			'stripe_live_sk'    => array( '/^(sk|rk)_live_[A-Za-z0-9]{16,}$/', 'a Stripe live secret key (starts with sk_live_)' ),
-			'stripe_test_whsec' => array( '/^whsec_[A-Za-z0-9]{16,}$/', 'a Stripe webhook signing secret (starts with whsec_)' ),
-			'stripe_live_whsec' => array( '/^whsec_[A-Za-z0-9]{16,}$/', 'a Stripe webhook signing secret (starts with whsec_)' ),
+			'stripe_test_whsec' => array( '/^whsec_[A-Za-z0-9+\/=_-]{16,}$/', 'a Stripe webhook signing secret (starts with whsec_)' ),
+			'stripe_live_whsec' => array( '/^whsec_[A-Za-z0-9+\/=_-]{16,}$/', 'a Stripe webhook signing secret (starts with whsec_)' ),
 		);
 		foreach ( self::SECRET_KEYS as $k ) {
 			$v = isset( $input[ $k ] ) ? trim( sanitize_text_field( wp_unslash( $input[ $k ] ) ) ) : '';
