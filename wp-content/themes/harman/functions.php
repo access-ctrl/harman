@@ -20,7 +20,7 @@ function harman_wp_enqueue_assets() {
   wp_enqueue_style('bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css');
   wp_enqueue_style('owl-style', get_template_directory_uri() . '/assets/css/owl.carousel.min.css');  
   wp_enqueue_style('menu-style', get_template_directory_uri() . '/assets/css/slimmenu.min.css');  
-  wp_enqueue_style('custom-css-style', get_template_directory_uri() . '/assets/css/style.css', [], '1.1.0');
+  wp_enqueue_style('custom-css-style', get_template_directory_uri() . '/assets/css/style.css', [], '1.1.3');
 
   wp_enqueue_script('jquery', get_template_directory_uri() . '/assets/js/jquery.min.js', [], null, true);
   wp_enqueue_script('menu', get_template_directory_uri() . '/assets/js/jquery.slimmenu.min.js', ['jquery'], null, true); 

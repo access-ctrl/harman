@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="200" viewBox="0 0 240 200" role="img" aria-label="A permanent resident card with a maple leaf and an approval stamp">
+<style>
+.cd{transform-box:fill-box;transform-origin:50% 100%;animation:cd 6s ease-in-out infinite both}
+.lf{transform-box:fill-box;transform-origin:50% 60%;animation:lf 3s ease-in-out infinite}
+.sp{transform-box:fill-box;transform-origin:center;animation:sp 6s ease-out infinite both}
+.rg{transform-box:fill-box;transform-origin:center;animation:rg 6s ease-out infinite both}
+.k{stroke-dasharray:50;animation:ck 6s ease-in-out infinite both}
+@keyframes cd{0%,4%{opacity:0;transform:translateY(30px) rotate(-10deg)}18%,88%{opacity:1;transform:rotate(-6deg)}96%,100%{opacity:0;transform:translateY(12px) rotate(-6deg)}}
+@keyframes lf{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes sp{0%,46%{opacity:0;transform:scale(2.2)}58%{opacity:1;transform:scale(.92)}64%,88%{opacity:1;transform:scale(1)}96%,100%{opacity:0}}
+@keyframes rg{0%,50%{opacity:0;transform:scale(1)}58%{opacity:.7}78%,100%{opacity:0;transform:scale(1.7)}}
+@keyframes ck{0%,56%{stroke-dashoffset:50}68%,88%{stroke-dashoffset:0}96%,100%{stroke-dashoffset:50}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}.rg{display:none}}
+</style>
+<circle cx="120" cy="104" r="92" fill="#F6E9FB"/>
+<g class="cd" transform="rotate(-6 120 100)"><rect x="30" y="52" width="156" height="104" rx="14" fill="#39074E"/><circle cx="68" cy="94" r="15" fill="#EBC258"/><path d="M44 142a24 20 0 0 1 48 0z" fill="#EBC258"/><path d="M104 80h60M104 98h44M104 116h52" stroke="#EBC258" stroke-width="6" stroke-linecap="round"/><g class="lf"><path transform="translate(140 106) scale(.36)" d="M50 4L58 22 72 16 68 38 88 30 80 50 96 54 74 70 78 78 56 74 56 96 44 96 44 74 22 78 26 70 4 54 20 50 12 30 32 38 28 16 42 22z" fill="#D2533E"/></g></g>
+<circle class="rg" cx="188" cy="144" r="30" fill="none" stroke="#EBC258" stroke-width="4"/>
+<g class="sp"><circle cx="188" cy="144" r="30" fill="#EBC258" stroke="#fff" stroke-width="5"/><path class="k" d="M174 145l10 10 18-22" fill="none" stroke="#39074E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

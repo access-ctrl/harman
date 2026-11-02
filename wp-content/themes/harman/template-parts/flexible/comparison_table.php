@@ -13,9 +13,13 @@ $table_2_icon = !empty($section['table_2_icon']) ? wp_kses_post($section['table_
 $table_2_video = $section['table_2_animated_video'] ?? '';
 $button2 = !empty($section['table_2_button']) ? $section['table_2_button'] : [];
 $tbl2lists = !empty($section['table_2_list']) && is_array($section['table_2_list']) ? $section['table_2_list'] : [];
+
+// Section spacing option (default keeps the original top and bottom padding).
+$space_options = ['space', 'space-top', 'space-bottom', 'no-space'];
+$space = !empty($section['space']) && in_array($section['space'], $space_options, true) ? $section['space'] : 'space';
 ?>
 
-<section class="comparison-table space light-pink">
+<section class="comparison-table <?php echo esc_attr($space); ?> light-pink">
   <div class="container">
     <?php if ($section_title): ?>
       <div class="row">

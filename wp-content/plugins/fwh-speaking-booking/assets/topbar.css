@@ -1,0 +1,182 @@
+/* Top bar and modal. Tokens mirror the Harman theme (purple #39074E, gold #EBC258, Manrope via inherit). */
+.fwh-sb-topbar {
+	position: relative;
+	z-index: 1000;
+	background: #39074e;
+	color: #fff;
+	font-family: inherit;
+	font-size: 14px;
+	line-height: 1.4;
+	animation: fwh-sb-bar-in .5s cubic-bezier(.2, .8, .2, 1) both;
+}
+.fwh-sb-topbar__inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 4px 16px;
+	max-width: 1320px;
+	margin: 0 auto;
+	padding: 6px 16px;
+	text-align: center;
+}
+.fwh-sb-topbar__text { margin: 0; font-size: 14px; font-weight: 600; color: #fff; }
+.fwh-sb-topbar__btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 44px;
+	padding: 6px 24px;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: #39074e;
+	background: #ebc258;
+	border: 0;
+	border-radius: 50px;
+	cursor: pointer;
+	transition: background-color .2s, color .2s, transform .15s, box-shadow .2s;
+}
+/* Attention ring: three gentle pulses after load, then it stays still. */
+.fwh-sb-topbar__btn::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	box-shadow: 0 0 0 0 rgba(235, 194, 88, .7);
+	opacity: 0;
+	pointer-events: none;
+	animation: fwh-sb-ring 1.8s ease-out 1.2s 3;
+}
+.fwh-sb-topbar__arrow { display: inline-block; transition: transform .2s cubic-bezier(.2, .8, .2, 1); }
+.fwh-sb-topbar__btn:hover { background: #fff; color: #39074e; box-shadow: 0 4px 14px rgba(0, 0, 0, .25); transform: translateY(-1px); }
+.fwh-sb-topbar__btn:hover .fwh-sb-topbar__arrow { transform: translateX(4px); }
+.fwh-sb-topbar__btn:active { transform: translateY(0) scale(.97); }
+.fwh-sb-topbar__btn:focus-visible,
+.fwh-sb-modal__close:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+@keyframes fwh-sb-bar-in { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fwh-sb-ring { 0% { opacity: 1; box-shadow: 0 0 0 0 rgba(235, 194, 88, .7); } 100% { opacity: 0; box-shadow: 0 0 0 14px rgba(235, 194, 88, 0); } }
+
+/* Page scroll lock without the page jumping when the scrollbar disappears. */
+html.fwh-sb-lock { overflow: hidden; padding-right: var(--fwh-sb-sbw, 0); }
+
+/* Modal: backdrop fades, panel rises (sheet from the bottom on phones). */
+.fwh-sb-modal[hidden] { display: none !important; }
+.fwh-sb-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity .24s ease;
+}
+.fwh-sb-modal.is-open { opacity: 1; }
+.fwh-sb-modal__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(25, 0, 35, .6);
+	-webkit-backdrop-filter: blur(3px);
+	backdrop-filter: blur(3px);
+}
+.fwh-sb-modal__panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-height: 94vh;
+	max-height: 94dvh;
+	background: #fff;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	border-radius: 20px 20px 0 0;
+	outline: none;
+	transform: translateY(40px);
+	opacity: 0;
+	transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .24s ease;
+	box-shadow: 0 -10px 40px rgba(25, 0, 35, .3);
+}
+/* Thin custom scrollbar: Firefox and standards first, then WebKit/Blink. */
+.fwh-sb-modal__panel {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(57, 7, 78, .35) transparent;
+}
+.fwh-sb-modal__panel::-webkit-scrollbar { width: 6px; height: 6px; }
+.fwh-sb-modal__panel::-webkit-scrollbar-track { background: transparent; }
+.fwh-sb-modal__panel::-webkit-scrollbar-track-piece:vertical:start { margin-top: 64px; } /* keep clear of the sticky header */
+.fwh-sb-modal__panel::-webkit-scrollbar-track-piece:vertical:end { margin-bottom: 12px; }
+.fwh-sb-modal__panel::-webkit-scrollbar-thumb {
+	background: rgba(57, 7, 78, .3);
+	border-radius: 999px;
+	transition: background .2s ease;
+}
+.fwh-sb-modal__panel::-webkit-scrollbar-thumb:hover { background: rgba(57, 7, 78, .6); }
+
+.fwh-sb-modal.is-open .fwh-sb-modal__panel { transform: none; opacity: 1; }
+.fwh-sb-modal.is-closing .fwh-sb-modal__panel { transform: translateY(24px); opacity: 0; transition-duration: .2s; }
+
+.fwh-sb-modal__head {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 10px 8px 10px 16px;
+	background: #fcf4ff;
+	border-bottom: 1px solid #d9c3e3;
+	transition: box-shadow .2s;
+}
+.fwh-sb-modal__head.is-scrolled { box-shadow: 0 6px 16px rgba(57, 7, 78, .12); }
+.fwh-sb-modal__heading { display: flex; flex-direction: column; min-width: 0; }
+.fwh-sb-modal__title { font-weight: 800; color: #39074e; font-size: 17px; line-height: 1.25; }
+.fwh-sb-modal__sub { font-size: 13px; color: #6b4a7a; }
+.fwh-sb-modal__close {
+	flex: none;
+	min-width: 44px;
+	min-height: 44px;
+	font-size: 28px;
+	line-height: 1;
+	color: #39074e;
+	background: transparent;
+	border: 0;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: background-color .2s, color .2s, transform .25s cubic-bezier(.2, .8, .2, 1);
+}
+.fwh-sb-modal__close:hover { background: #39074e; color: #fff; transform: rotate(90deg); }
+.fwh-sb-modal__close:active { transform: rotate(90deg) scale(.92); }
+.fwh-sb-modal .fwh-sb-wrap { width: 100%; margin: 0 auto; }
+
+@media (min-width: 700px) {
+	.fwh-sb-modal { align-items: center; padding: 24px; }
+	.fwh-sb-modal__panel {
+		max-width: 780px;
+		max-height: calc(100vh - 48px);
+		max-height: calc(100dvh - 48px);
+		border-radius: 20px;
+		transform: translateY(16px) scale(.97);
+		box-shadow: 0 24px 70px rgba(25, 0, 35, .4);
+	}
+	.fwh-sb-modal.is-closing .fwh-sb-modal__panel { transform: translateY(8px) scale(.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fwh-sb-topbar,
+	.fwh-sb-topbar__btn::after { animation: none; }
+	.fwh-sb-topbar__btn,
+	.fwh-sb-topbar__arrow,
+	.fwh-sb-modal,
+	.fwh-sb-modal__panel,
+	.fwh-sb-modal__close { transition: none !important; }
+	.fwh-sb-topbar__btn:hover,
+	.fwh-sb-topbar__btn:hover .fwh-sb-topbar__arrow,
+	.fwh-sb-modal__close:hover { transform: none; }
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="200" viewBox="0 0 240 200" role="img" aria-label="A written page being corrected with feedback comments">
+<style>
+.l{transform-box:fill-box;transform-origin:0 50%;animation:ln 6s ease-in-out infinite both}
+.l2{animation-delay:.5s}.l3{animation-delay:1s}.l4{animation-delay:1.5s}
+.u{stroke-dasharray:90;animation:ud 6s ease-in-out infinite both}
+.c{transform-box:fill-box;transform-origin:20% 100%;animation:cm 6s ease-in-out infinite both}
+.p{animation:pn 6s ease-in-out infinite both}
+.k{stroke-dasharray:26;animation:ck 6s ease-in-out infinite both}
+@keyframes ln{0%{transform:scaleX(0)}16%,86%{transform:scaleX(1)}96%,100%{transform:scaleX(0)}}
+@keyframes ud{0%,34%{stroke-dashoffset:90}46%,86%{stroke-dashoffset:0}96%,100%{stroke-dashoffset:90}}
+@keyframes cm{0%,48%{opacity:0;transform:scale(.4)}58%,86%{opacity:1;transform:scale(1)}96%,100%{opacity:0}}
+@keyframes ck{0%,60%{stroke-dashoffset:26}70%,86%{stroke-dashoffset:0}96%,100%{stroke-dashoffset:26}}
+@keyframes pn{0%{transform:translate(0,0)}6%{transform:translate(0,0)}16%{transform:translate(52px,0)}22%{transform:translate(0,25px)}32%{transform:translate(70px,25px)}38%{transform:translate(0,50px)}48%{transform:translate(40px,50px)}60%,100%{transform:translate(70px,60px);opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<circle cx="120" cy="104" r="92" fill="#F6E9FB"/>
+<rect x="50" y="22" width="124" height="158" rx="12" fill="#fff" stroke="#39074E" stroke-width="5"/>
+<g stroke-width="7" stroke-linecap="round" stroke="#39074E"><path class="l" d="M70 52h72"/><path class="l l2" d="M70 77h84"/><path class="l l3" d="M70 102h60"/><path class="l l4" d="M70 127h78"/></g>
+<path class="u" d="M96 85q4 6 8 0t8 0t8 0t8 0t8 0t8 0" fill="none" stroke="#D2533E" stroke-width="3" stroke-linecap="round"/>
+<g class="c"><rect x="146" y="28" width="82" height="52" rx="18" fill="#EBC258"/><path d="M158 78l6 20 14-18z" fill="#EBC258"/><path class="k" d="M168 54l10 10 22-22" fill="none" stroke="#39074E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g class="p"><path d="M62 150l30-30 8 8-30 30-12 4z" fill="#D2533E"/><path d="M92 120l8 8 6-6-8-8z" fill="#39074E"/><path d="M50 158l4-12 8 8z" fill="#EBC258"/></g>
+</svg>

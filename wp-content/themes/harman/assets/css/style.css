@@ -275,6 +275,14 @@ ul.slimmenu li.current-menu-item a {
   width: calc(50% - 20px);
 }
 
+/* Stacked comparison sections with padding removed keep a small gap between card rows. */
+.comparison-table.space-top + .comparison-table.space-bottom,
+.comparison-table.space-top + .comparison-table.no-space,
+.comparison-table.no-space + .comparison-table.space-bottom,
+.comparison-table.no-space + .comparison-table.no-space {
+  margin-top: 40px;
+}
+
 .comp-table .comp-table-left {
   max-width: calc(100% - 230px);
 }
@@ -295,6 +303,11 @@ ul.slimmenu li.current-menu-item a {
 
 .comp-table .comp-table-right {
   max-width: 200px;
+}
+.comp-table .comp-table-right img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .listitems ul,
 .comp-table .comp-table-body ul {
@@ -1320,6 +1333,14 @@ footer {
     padding-bottom: 70px;
   }
 
+  .comparison-table.space-top {
+    padding-top: 70px;
+  }
+
+  .comparison-table.space-bottom {
+    padding-bottom: 70px;
+  }
+
   .comp-table {
     padding: 30px;
   }
@@ -1562,6 +1583,21 @@ footer {
   .space {
     padding-top: 50px;
     padding-bottom: 50px;
+  }
+
+  .comparison-table.space-top {
+    padding-top: 50px;
+  }
+
+  .comparison-table.space-bottom {
+    padding-bottom: 50px;
+  }
+
+  .comparison-table.space-top + .comparison-table.space-bottom,
+  .comparison-table.space-top + .comparison-table.no-space,
+  .comparison-table.no-space + .comparison-table.space-bottom,
+  .comparison-table.no-space + .comparison-table.no-space {
+    margin-top: 24px;
   }
 
   .comparison-table .col-lg-6 {

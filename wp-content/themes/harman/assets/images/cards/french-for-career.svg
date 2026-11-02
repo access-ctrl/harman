@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="200" viewBox="0 0 240 200" role="img" aria-label="A briefcase with a rising career growth arrow">
+<style>
+.bc{transform-box:fill-box;transform-origin:50% 100%;animation:bc 6s ease-in-out infinite both}
+.ar{stroke-dasharray:190;animation:ar 6s ease-in-out infinite both}
+.hd{transform-box:fill-box;transform-origin:center;animation:hd 6s ease-in-out infinite both}
+.st{transform-box:fill-box;transform-origin:center;animation:st 6s ease-in-out infinite both}
+.bar{transform-box:fill-box;transform-origin:50% 100%;animation:br 6s ease-in-out infinite both}
+.b2{animation-delay:.25s}.b3{animation-delay:.5s}
+@keyframes bc{0%,4%{opacity:0;transform:translateY(24px)}16%,88%{opacity:1;transform:none}96%,100%{opacity:0;transform:translateY(10px)}}
+@keyframes br{0%,16%{transform:scaleY(0)}34%,88%{transform:scaleY(1)}96%,100%{transform:scaleY(0)}}
+@keyframes ar{0%,30%{stroke-dashoffset:190}52%,88%{stroke-dashoffset:0}96%,100%{stroke-dashoffset:190}}
+@keyframes hd{0%,52%{opacity:0;transform:scale(.3)}58%,88%{opacity:1;transform:scale(1)}96%,100%{opacity:0}}
+@keyframes st{0%,52%{opacity:0;transform:scale(0) rotate(-40deg)}62%{opacity:1;transform:scale(1.25) rotate(0)}68%,88%{opacity:1;transform:scale(1)}96%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<circle cx="120" cy="104" r="92" fill="#F6E9FB"/>
+<g fill="#EBC258"><rect class="bar" x="58" y="82" width="22" height="34" rx="4"/><rect class="bar b2" x="92" y="64" width="22" height="52" rx="4"/><rect class="bar b3" x="126" y="44" width="22" height="72" rx="4"/></g>
+<path class="ar" d="M46 110L96 74l30 14 60-52" fill="none" stroke="#D2533E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="hd" d="M170 30l26 4-10 24z" fill="#D2533E"/>
+<g class="bc"><path d="M96 124v-12a8 8 0 0 1 8-8h32a8 8 0 0 1 8 8v12" fill="none" stroke="#39074E" stroke-width="8"/><rect x="50" y="122" width="140" height="64" rx="12" fill="#39074E"/><rect x="50" y="146" width="140" height="6" fill="#2a0539"/><rect x="108" y="140" width="24" height="20" rx="5" fill="#EBC258"/></g>
+<path class="st" d="M206 42l4 9 10 1-8 7 3 10-9-6-9 6 3-10-8-7 10-1z" fill="#EBC258"/>
+</svg>

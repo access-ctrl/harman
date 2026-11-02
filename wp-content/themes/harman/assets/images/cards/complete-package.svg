@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="200" viewBox="0 0 240 200" role="img" aria-label="A complete French package: speaking, writing and reading">
+<style>
+.ch{transform-box:fill-box;transform-origin:center;animation:pop 6s ease-in-out infinite both}
+.c2{animation-delay:.6s}.c3{animation-delay:1.2s}
+.bd{transform-box:fill-box;transform-origin:center;animation:bd 6s ease-in-out infinite both}
+.k{stroke-dasharray:60;animation:ck 6s ease-in-out infinite both}
+.rg{transform-box:fill-box;transform-origin:center;animation:rg 3s ease-out infinite}
+@keyframes pop{0%,4%{opacity:0;transform:scale(.3)}14%{opacity:1;transform:scale(1.12)}20%,88%{opacity:1;transform:scale(1)}96%,100%{opacity:0;transform:scale(.8)}}
+@keyframes bd{0%,10%{transform:scale(.8)}30%,88%{transform:scale(1)}96%,100%{transform:scale(.8)}}
+@keyframes ck{0%,40%{stroke-dashoffset:60}56%,88%{stroke-dashoffset:0}96%,100%{stroke-dashoffset:60}}
+@keyframes rg{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}.rg{display:none}}
+</style>
+<circle cx="120" cy="104" r="92" fill="#F6E9FB"/>
+<circle class="rg" cx="120" cy="104" r="44" fill="none" stroke="#39074E" stroke-width="3"/>
+<g class="bd"><circle cx="120" cy="104" r="44" fill="#39074E"/><path class="k" d="M98 106l16 16 30-34" fill="none" stroke="#EBC258" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g class="ch"><circle cx="44" cy="52" r="26" fill="#EBC258"/><rect x="30" y="40" width="28" height="19" rx="8" fill="#39074E"/><path d="M38 58l2 8 8-8z" fill="#39074E"/></g>
+<g class="ch c2"><circle cx="196" cy="52" r="26" fill="#D2533E"/><path d="M184 70l4-12 18-18 8 8-18 18z" fill="#fff"/><path d="M184 70l4-12 8 8z" fill="#39074E"/></g>
+<g class="ch c3"><circle cx="120" cy="170" r="24" fill="#fff" stroke="#39074E" stroke-width="4"/><path d="M120 160q-12-6-22-2v22q10-4 22 2zM120 160q12-6 22-2v22q-10-4-22 2z" fill="#EBC258" stroke="#39074E" stroke-width="3" stroke-linejoin="round"/></g>
+</svg>
