@@ -82,7 +82,9 @@ class Shortcode {
 			'currency' => strtoupper( (string) Settings::get( 'currency' ) ),
 			'from'     => $today->format( 'Y-m-d' ),
 			'to'       => $last->format( 'Y-m-d' ),
-			'timezones' => timezone_identifiers_list(),
+			'timezones' => array_keys( Time::canada_zones() ),
+			'tzLabels' => Time::canada_zones(),
+			'tzAliases' => Time::canada_aliases(),
 			'homeTz'   => 'America/Toronto',
 			'contactEmail' => (string) Settings::get( 'contact_email' ),
 		);

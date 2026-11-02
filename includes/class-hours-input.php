@@ -81,8 +81,8 @@ class Hours_Input {
 		foreach ( $hours as $h ) {
 			$rows[] = array( (int) $h->weekday, substr( $h->start_time, 0, 5 ), substr( $h->end_time, 0, 5 ) );
 		}
-		for ( $i = 0; $i < 4; $i++ ) {
-			$rows[] = array( 1, '', '' );
+		foreach ( array_keys( self::DAYS ) as $day ) { // A blank row for every day Mon-Sat, so each day can be filled in.
+			$rows[] = array( $day, '', '' );
 		}
 		echo '<table class="widefat" style="max-width:520px" id="fwh-sb-hours"><thead><tr><th>Day</th><th>Start</th><th>End</th></tr></thead><tbody>';
 		foreach ( $rows as $r ) {

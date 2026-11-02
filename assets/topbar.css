@@ -102,6 +102,22 @@ html.fwh-sb-lock { overflow: hidden; padding-right: var(--fwh-sb-sbw, 0); }
 	transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .24s ease;
 	box-shadow: 0 -10px 40px rgba(25, 0, 35, .3);
 }
+/* Thin custom scrollbar: Firefox and standards first, then WebKit/Blink. */
+.fwh-sb-modal__panel {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(57, 7, 78, .35) transparent;
+}
+.fwh-sb-modal__panel::-webkit-scrollbar { width: 6px; height: 6px; }
+.fwh-sb-modal__panel::-webkit-scrollbar-track { background: transparent; }
+.fwh-sb-modal__panel::-webkit-scrollbar-track-piece:vertical:start { margin-top: 64px; } /* keep clear of the sticky header */
+.fwh-sb-modal__panel::-webkit-scrollbar-track-piece:vertical:end { margin-bottom: 12px; }
+.fwh-sb-modal__panel::-webkit-scrollbar-thumb {
+	background: rgba(57, 7, 78, .3);
+	border-radius: 999px;
+	transition: background .2s ease;
+}
+.fwh-sb-modal__panel::-webkit-scrollbar-thumb:hover { background: rgba(57, 7, 78, .6); }
+
 .fwh-sb-modal.is-open .fwh-sb-modal__panel { transform: none; opacity: 1; }
 .fwh-sb-modal.is-closing .fwh-sb-modal__panel { transform: translateY(24px); opacity: 0; transition-duration: .2s; }
 

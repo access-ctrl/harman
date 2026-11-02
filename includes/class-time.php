@@ -44,6 +44,16 @@ class Time {
 		return $dt->setTimezone( self::toronto() )->format( $format );
 	}
 
+	/** Time zones offered to students, id => label. Eastern Time only. */
+	public static function canada_zones(): array {
+		return array( 'America/Toronto' => 'Eastern Time (Toronto)' );
+	}
+
+	/** Browser zone ids mapped to an offered zone. Everything shows in Eastern Time, so none are needed. */
+	public static function canada_aliases(): array {
+		return array();
+	}
+
 	public static function valid_date( string $date ): bool {
 		$dt = \DateTimeImmutable::createFromFormat( '!Y-m-d', $date );
 		return $dt && $dt->format( 'Y-m-d' ) === $date;

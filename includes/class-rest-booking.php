@@ -86,7 +86,7 @@ class Rest_Booking {
 		if ( ! preg_match( '/^\+\d[\d\s\-()]{6,19}$/', $phone ) ) {
 			return $this->error( 'fwh_sb_invalid', __( 'Please enter your phone number starting with the country code.', 'fwh-speaking-booking' ), 400 );
 		}
-		if ( ! in_array( $tz, timezone_identifiers_list(), true ) ) {
+		if ( ! array_key_exists( $tz, Time::canada_zones() ) ) {
 			return $this->error( 'fwh_sb_invalid', __( 'Unrecognised time zone.', 'fwh-speaking-booking' ), 400 );
 		}
 		$dt = \DateTimeImmutable::createFromFormat( '!Y-m-d\TH:i:s\Z', $start, Time::utc() );

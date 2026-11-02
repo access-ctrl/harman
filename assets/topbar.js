@@ -81,6 +81,13 @@
 	}
 
 	openBtn.addEventListener('click', open);
+	// Any link or button pointing at #fwh-book (or marked data-fwh-book) opens the booking window, e.g. "Enroll now" on the Courses page.
+	document.addEventListener('click', function (ev) {
+		var t = ev.target && ev.target.closest ? ev.target.closest('a[href="#fwh-book"], [data-fwh-book]') : null;
+		if (!t || modal.contains(t)) { return; }
+		ev.preventDefault();
+		open();
+	});
 	modal.addEventListener('click', function (ev) {
 		if (ev.target.closest && ev.target.closest('[data-fwh-close]')) { close(); }
 	});
@@ -101,5 +108,5 @@
 	});
 
 	// Coming back from Stripe: reopen straight onto the confirmation / cancel message.
-	if (/[?&]fwh_sb_return=/.test(window.location.search)) { open(); }
+	if (/[?&]fwh_sb_return=/.test(window.location.search) || window.location.hash === '#fwh-book') { open(); }
 })();

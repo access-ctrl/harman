@@ -58,6 +58,7 @@ class Admin_Settings {
 		$s = Settings::all();
 		echo '<div class="wrap"><h1>' . esc_html__( 'Speaking Booking Settings', 'fwh-speaking-booking' ) . '</h1>';
 		settings_errors( Settings::OPTION );
+		Mailer::failure_notice();
 		$mode = Stripe_Client::mode();
 		if ( ! Stripe_Client::configured() ) {
 			echo '<div class="notice notice-warning"><p>' . esc_html(

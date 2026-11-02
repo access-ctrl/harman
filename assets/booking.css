@@ -55,8 +55,10 @@
 }
 
 /* Time zone row */
-.fwh-sb-wrap .fwh-sb-tzrow { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
-.fwh-sb-wrap .fwh-sb-tzrow label { font-weight: 700; font-size: 14px; }
+.fwh-sb-wrap .fwh-sb-tzrow { display: flex; flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 12px; }
+.fwh-sb-wrap .fwh-sb-tznote { margin: 0 0 12px; font-size: 14px; font-weight: 600; opacity: .8; }
+.fwh-sb-wrap .fwh-sb-tzrow label { font-weight: 700; font-size: 14px; line-height: 1.2; }
+.fwh-sb-wrap .fwh-sb-tzrow select { width: 100%; font-size: 16px; }
 .fwh-sb-wrap select,
 .fwh-sb-wrap input[type="text"],
 .fwh-sb-wrap input[type="email"],
@@ -71,8 +73,23 @@
 	border-radius: 12px;
 }
 
+/* Dropdown: custom chevron, roomy padding, clean focus */
+.fwh-sb-wrap select {
+	-webkit-appearance: none;
+	appearance: none;
+	padding-right: 44px;
+	line-height: 1.3;
+	text-overflow: ellipsis;
+	cursor: pointer;
+	background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2339074E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 16px center / 16px 16px;
+	transition: border-color .18s ease, box-shadow .18s ease;
+}
+.fwh-sb-wrap select:hover { border-color: var(--fwh-purple, #39074E); }
+.fwh-sb-wrap select:focus { border-color: var(--fwh-purple, #39074E); box-shadow: 0 0 0 3px rgba(235, 194, 88, .45); outline: none; }
+
 /* Status, loading, error */
-.fwh-sb-wrap .fwh-sb-status { min-height: 1.5em; margin: 0 0 12px; font-weight: 600; }
+.fwh-sb-wrap .fwh-sb-status { margin: 0; font-weight: 600; }
+.fwh-sb-wrap .fwh-sb-status:not(:empty) { margin: 0 0 12px; }
 .fwh-sb-wrap .fwh-sb-loading { display: flex; align-items: center; gap: 12px; padding: 24px 0; font-weight: 600; }
 .fwh-sb-wrap .fwh-sb-spinner {
 	width: 24px; height: 24px; flex: none;
@@ -209,8 +226,6 @@
 @media (min-width: 600px) {
 	.fwh-sb-wrap { padding: 24px; }
 	.fwh-sb-wrap h2 { font-size: 30px; }
-	.fwh-sb-wrap .fwh-sb-tzrow { flex-direction: row; align-items: center; gap: 12px; }
-	.fwh-sb-wrap .fwh-sb-tzrow select { max-width: 360px; }
 	.fwh-sb-wrap .fwh-sb-grid { gap: 8px; }
 	.fwh-sb-wrap .fwh-sb-submit { width: auto; min-width: 280px; }
 	.fwh-sb-wrap .fwh-sb-return { padding: 40px 24px; }

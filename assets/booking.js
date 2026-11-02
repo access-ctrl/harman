@@ -31,7 +31,8 @@
 		try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { tz = ''; }
 		tz = ALIASES[tz] || tz;
 		if (!cfg.timezones) { return 'America/Toronto'; } // Remote mode: the list arrives with the config.
-		return cfg.timezones.indexOf(tz) !== -1 ? tz : cfg.homeTz;
+		if (cfg.timezones.indexOf(tz) === -1 && cfg.tzAliases && cfg.tzAliases[tz]) { tz = cfg.tzAliases[tz]; }
+		return cfg.timezones.indexOf(tz) !== -1 ? tz : (cfg.homeTz || 'America/Toronto'); // Outside Canada: start on Toronto.
 	}
 
 	function fmt(key, tz, opts) {
@@ -45,9 +46,9 @@
 		}
 		return fmtCache['key|' + tz].format(new Date(iso));
 	}
-	function timeLabel(iso, tz) { return fmt('t', tz, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso)); }
+	function timeLabel(iso, tz) { return fmt('t', tz, { hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(iso)); }
 	function longLabel(iso, tz) {
-		return fmt('l', tz, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
+		return fmt('l', tz, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(iso));
 	}
 
 	function money() {
@@ -140,21 +141,27 @@
 			els.steps.appendChild(li);
 		});
 		body.appendChild(els.steps);
-		var tzRow = el('div', { 'class': 'fwh-sb-tzrow' });
-		var tzLabel = el('label', { 'for': 'fwh-sb-tz' }, 'Your time zone');
-		els.tz = el('select', { id: 'fwh-sb-tz' });
-		cfg.timezones.forEach(function (z) {
-			var o = el('option', { value: z }, z.replace(/_/g, ' '));
-			if (z === state.tz) { o.selected = true; }
-			els.tz.appendChild(o);
-		});
-		els.tz.addEventListener('change', function () {
-			state.tz = els.tz.value; state.day = null; state.slot = null; state.monthKey = null;
-			state.enter = { cal: true };
-			render();
-		});
-		tzRow.appendChild(tzLabel); tzRow.appendChild(els.tz);
-		body.appendChild(tzRow);
+		var tzName = (cfg.tzLabels && cfg.tzLabels[state.tz]) || state.tz.replace(/_/g, ' ');
+		if (cfg.timezones.length < 2) {
+			// One time zone only (Eastern): no selector, just say what the times are in.
+			body.appendChild(el('p', { 'class': 'fwh-sb-tznote' }, 'All times are shown in ' + tzName + '.'));
+		} else {
+			var tzRow = el('div', { 'class': 'fwh-sb-tzrow' });
+			var tzLabel = el('label', { 'for': 'fwh-sb-tz' }, 'Your time zone');
+			els.tz = el('select', { id: 'fwh-sb-tz' });
+			cfg.timezones.forEach(function (z) {
+				var o = el('option', { value: z }, (cfg.tzLabels && cfg.tzLabels[z]) || z.replace(/_/g, ' '));
+				if (z === state.tz) { o.selected = true; }
+				els.tz.appendChild(o);
+			});
+			els.tz.addEventListener('change', function () {
+				state.tz = els.tz.value; state.day = null; state.slot = null; state.monthKey = null;
+				state.enter = { cal: true };
+				render();
+			});
+			tzRow.appendChild(tzLabel); tzRow.appendChild(els.tz);
+			body.appendChild(tzRow);
+		}
 
 		els.status = el('p', { 'class': 'fwh-sb-status', role: 'status' });
 		els.cal = el('div', { 'class': 'fwh-sb-cal' });
@@ -318,7 +325,7 @@
 		els.slots.appendChild(el('h3', null, 'Available times'));
 		var parts = [cfg.duration + ' minutes'];
 		if (money()) { parts.push(money()); }
-		parts.push('times shown in ' + state.tz.replace(/_/g, ' '));
+		parts.push('times shown in ' + ((cfg.tzLabels && cfg.tzLabels[state.tz]) || state.tz.replace(/_/g, ' ')));
 		els.slots.appendChild(el('p', { 'class': 'fwh-sb-note' }, parts.join(' · ')));
 		var wrap = el('div', { 'class': 'fwh-sb-slotlist', role: 'group', 'aria-label': 'Available times' });
 		list.forEach(function (iso, idx) {

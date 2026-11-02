@@ -18,7 +18,10 @@ class Google_Client {
 	private const CAL_URL   = 'https://www.googleapis.com/calendar/v3/';
 
 	public static function redirect_uri(): string {
-		return admin_url( 'admin-post.php?action=fwh_sb_google_callback' );
+		// Google only accepts https redirect URIs for real domains (http is allowed for localhost only).
+		$url  = admin_url( 'admin-post.php?action=fwh_sb_google_callback' );
+		$host = (string) wp_parse_url( $url, PHP_URL_HOST );
+		return in_array( $host, array( 'localhost', '127.0.0.1' ), true ) ? $url : set_url_scheme( $url, 'https' );
 	}
 
 	public static function configured(): bool {

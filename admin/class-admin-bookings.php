@@ -16,6 +16,24 @@ class Admin_Bookings {
 
 	public function init(): void {
 		add_action( 'admin_post_fwh_sb_cancel_booking', array( $this, 'handle_cancel' ) );
+		add_action( 'admin_post_fwh_sb_resend_emails', array( $this, 'handle_resend' ) );
+	}
+
+	public function handle_resend(): void {
+		if ( ! $this->allowed() ) {
+			wp_die( esc_html__( 'You do not have permission to do this.', 'fwh-speaking-booking' ), 403 );
+		}
+		check_admin_referer( 'fwh_sb_resend_emails' );
+		$id = isset( $_POST['booking_id'] ) ? absint( $_POST['booking_id'] ) : 0;
+		$b  = $id ? Bookings::get( $id ) : null;
+		if ( $b && 'paid' === $b->status && 'ok' === $b->meet_status && Mailer::send_confirmations( $id ) ) {
+			Notice::add( 'success', __( 'Confirmation emails sent.', 'fwh-speaking-booking' ) );
+		} else {
+			Notice::add( 'error', __( 'The emails could not be sent. Check the site mail (SMTP) setup.', 'fwh-speaking-booking' ) );
+		}
+		$back = wp_get_referer();
+		wp_safe_redirect( $back ? $back : add_query_arg( 'page', self::PAGE, admin_url( 'admin.php' ) ) );
+		exit;
 	}
 
 	private function allowed(): bool {
@@ -92,6 +110,7 @@ class Admin_Bookings {
 
 		echo '<div class="wrap fwh-sb-admin"><h1>' . esc_html__( 'Bookings', 'fwh-speaking-booking' ) . '</h1>';
 		Notice::render();
+		Mailer::failure_notice();
 
 		$filters = array_filter( array( 'trainer' => $trainer, 'from' => $from, 'to' => $to ) );
 		echo '<h2 class="nav-tab-wrapper">';
@@ -122,6 +141,9 @@ class Admin_Bookings {
 			echo '<td>' . esc_html( Time::utc_to_toronto( $b->start_utc, 'D j M Y, H:i' ) ) . '</td><td>' . esc_html( ucfirst( $b->status ) ) . '</td><td>';
 			echo $b->meet_link ? '<a target="_blank" rel="noopener noreferrer" href="' . esc_url( $b->meet_link ) . '">' . esc_html__( 'Open', 'fwh-speaking-booking' ) . '</a>' : '&mdash;'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above.
 			echo '</td><td>' . esc_html( $b->meet_status );
+			if ( 'paid' === $b->status && 'ok' === $b->meet_status ) {
+				echo ' ' . $this->action_form( 'fwh_sb_resend_emails', 'fwh_sb_resend_emails', (int) $b->id, __( 'Resend emails', 'fwh-speaking-booking' ), __( 'Send the confirmation emails to the student and trainer again?', 'fwh-speaking-booking' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in action_form().
+			}
 			if ( 'paid' === $b->status && 'ok' !== $b->meet_status ) {
 				echo ' ' . $this->action_form( 'fwh_sb_retry_meet', 'fwh_sb_retry_meet', (int) $b->id, __( 'Retry Meet link', 'fwh-speaking-booking' ), '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in action_form().
 			}
