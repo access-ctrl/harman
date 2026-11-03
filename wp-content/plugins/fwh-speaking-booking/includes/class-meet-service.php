@@ -118,13 +118,14 @@ class Meet_Service {
 	}
 
 	private static function event_body( object $b, object $trainer, bool $fallback ): array {
-		$attendees = array( array( 'email' => $b->student_email, 'displayName' => $b->student_name ) );
+		// The student is not added as a guest: the trainer must not see the student's email. The student asks to join and the trainer admits them.
+		$attendees = array();
 		if ( $fallback && is_email( $trainer->google_email ?: $trainer->email ) ) {
 			$attendees[] = array( 'email' => $trainer->google_email ?: $trainer->email );
 		}
 		return array(
 			'summary'        => 'French Speaking Session - ' . $b->student_name,
-			'description'    => "Booking ref: {$b->ref}\nStudent phone: {$b->student_phone}",
+			'description'    => "Booking ref: {$b->ref}",
 			'start'          => array( 'dateTime' => Availability::to_iso( $b->start_utc ), 'timeZone' => 'UTC' ),
 			'end'            => array( 'dateTime' => Availability::to_iso( $b->end_utc ), 'timeZone' => 'UTC' ),
 			'attendees'      => $attendees,

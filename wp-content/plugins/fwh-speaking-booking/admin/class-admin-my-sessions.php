@@ -67,12 +67,12 @@ class Admin_My_Sessions {
 				'limit'      => 200,
 			)
 		);
-		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'When (Toronto)', 'fwh-speaking-booking' ) . '</th><th>' . esc_html__( 'Booking', 'fwh-speaking-booking' ) . '</th><th>' . esc_html__( 'Meeting', 'fwh-speaking-booking' ) . '</th></tr></thead><tbody>';
+		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'When (Toronto)', 'fwh-speaking-booking' ) . '</th><th>' . esc_html__( 'Student', 'fwh-speaking-booking' ) . '</th><th>' . esc_html__( 'Booking', 'fwh-speaking-booking' ) . '</th><th>' . esc_html__( 'Meeting', 'fwh-speaking-booking' ) . '</th></tr></thead><tbody>';
 		if ( ! $res['rows'] ) {
-			echo '<tr><td colspan="3">' . esc_html__( 'No sessions.', 'fwh-speaking-booking' ) . '</td></tr>';
+			echo '<tr><td colspan="4">' . esc_html__( 'No sessions.', 'fwh-speaking-booking' ) . '</td></tr>';
 		}
 		foreach ( $res['rows'] as $b ) {
-			echo '<tr><td>' . esc_html( Time::utc_to_toronto( $b->start_utc, 'D j M Y, H:i' ) ) . '</td><td>' . esc_html( $b->ref ) . '</td><td>' . $this->join_button( $b ) . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in join_button().
+			echo '<tr><td>' . esc_html( Time::utc_to_toronto( $b->start_utc, 'D j M Y, H:i' ) ) . '</td><td>' . esc_html( $b->student_name ) . '</td><td>' . esc_html( $b->ref ) . '</td><td>' . $this->join_button( $b ) . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in join_button().
 		}
 		echo '</tbody></table>';
 	}
@@ -133,7 +133,7 @@ class Admin_My_Sessions {
 			$key = $cursor->format( 'Y-m-d' );
 			echo '<div class="fwh-sb-cal-cell' . ( $key === $today ? ' is-today' : '' ) . '"><span class="fwh-sb-cal-day">' . esc_html( $cursor->format( 'j' ) ) . '</span>';
 			foreach ( $by_day[ $key ] ?? array() as $b ) {
-				echo '<div class="fwh-sb-cal-event"><strong>' . esc_html( Time::utc_to_toronto( $b->start_utc, 'H:i' ) ) . '</strong> ' . esc_html( $b->ref );
+				echo '<div class="fwh-sb-cal-event"><strong>' . esc_html( Time::utc_to_toronto( $b->start_utc, 'H:i' ) ) . '</strong> ' . esc_html( $b->student_name ) . ' <span class="description">' . esc_html( $b->ref ) . '</span>';
 				if ( 'ok' === $b->meet_status && $b->meet_link ) {
 					echo ' <a target="_blank" rel="noopener noreferrer" href="' . esc_url( $b->meet_link ) . '">' . esc_html__( 'Join', 'fwh-speaking-booking' ) . '</a>';
 				}

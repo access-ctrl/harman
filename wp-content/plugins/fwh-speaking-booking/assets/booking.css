@@ -229,7 +229,8 @@
 
 /* Return page */
 .fwh-sb-wrap .fwh-sb-return { background: var(--fwh-panel); border: 1px solid var(--fwh-line); border-radius: 16px; padding: 24px 16px; text-align: center; }
-.fwh-sb-wrap .fwh-sb-return .fwh-sb-spinner { margin: 0 auto 16px; }
+/* The spinner is a <span>: without display:block it stays inline and its size is ignored, leaving a thin sliver. */
+.fwh-sb-wrap .fwh-sb-return .fwh-sb-spinner { display: block; width: 40px; height: 40px; border-width: 4px; margin: 0 auto 16px; }
 
 @media (min-width: 600px) {
 	.fwh-sb-wrap { padding: 24px; }

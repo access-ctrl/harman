@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
 <p>Your 1-to-1 French speaking session (<?php echo esc_html( (string) ( $duration_label ?? $duration . ' minutes' ) ); ?>) is booked.</p>
 <p><strong><?php echo esc_html( $when ); ?></strong><br><?php echo esc_html( $zone ); ?></p>
 <p style="margin:24px 0;"><a href="<?php echo esc_url( $b->meet_link ); ?>" style="background:#1a1a1a;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;display:inline-block;">Join the session</a></p>
-<p style="font-size:14px;">Join with the Google account using this email to enter directly; otherwise click <em>Ask to join</em> and your trainer will let you in.</p>
+<p style="font-size:14px;">When you open the link, click <em>Ask to join</em> and your trainer will let you in.</p>
 <p style="font-size:14px;">Booking reference: <strong><?php echo esc_html( $b->ref ); ?></strong></p>
 <?php $whatsapp = (string) ( $whatsapp ?? '' ); $wa_digits = preg_replace( '/\D/', '', $whatsapp ); ?>
 <?php if ( '' !== $contact || '' !== $wa_digits ) : ?>
