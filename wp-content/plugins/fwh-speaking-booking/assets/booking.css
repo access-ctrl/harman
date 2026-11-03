@@ -170,6 +170,14 @@
 .fwh-sb-wrap .fwh-sb-slotlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
 .fwh-sb-wrap .fwh-sb-slot { padding: 0 8px; }
 
+/* Day and time pickers */
+.fwh-sb-wrap .fwh-sb-placeholder { margin: 24px 0 0; color: var(--fwh-ink-soft); font-size: 14px; text-align: center; }
+.fwh-sb-wrap .fwh-sb-slotgroup h4 { margin: 16px 0 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--fwh-ink-soft); }
+.fwh-sb-wrap .fwh-sb-slotgroup:first-child h4 { margin-top: 0; }
+/* Calendar and times are both full width, one under the other */
+.fwh-sb-wrap .fwh-sb-pick { display: block; }
+.fwh-sb-wrap .fwh-sb-slotlist { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+
 /* Form */
 .fwh-sb-wrap .fwh-sb-summary {
 	background: var(--fwh-panel);

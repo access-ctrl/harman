@@ -16,6 +16,7 @@ class Admin_Trainers {
 	public function init(): void {
 		add_action( 'admin_post_fwh_sb_save_trainer', array( $this, 'handle_save' ) );
 		add_action( 'admin_post_fwh_sb_toggle_trainer', array( $this, 'handle_toggle' ) );
+		add_action( 'admin_post_fwh_sb_delete_trainer', array( $this, 'handle_delete' ) );
 		add_action( 'admin_post_fwh_sb_create_login', array( $this, 'handle_create_login' ) );
 	}
 
@@ -42,6 +43,13 @@ class Admin_Trainers {
 			Notice::add( 'error', __( 'Trainer not found.', 'fwh-speaking-booking' ) );
 			Notice::redirect( self::PAGE );
 		}
+		// One trainer per email address (case-insensitive), so the same person cannot be added twice.
+		foreach ( Repo::trainers() as $other ) {
+			if ( (int) $other->id !== $id && 0 === strcasecmp( (string) $other->email, $email ) ) {
+				Notice::add( 'error', sprintf( /* translators: %s: trainer name */ __( 'A trainer with this email already exists (%s). Edit that trainer instead of adding a new one.', 'fwh-speaking-booking' ), $other->name ) );
+				Notice::redirect( self::PAGE, $id ? $back : array( 'action' => 'new' ) );
+			}
+		}
 
 		$rows = Hours_Input::parse_post();
 		if ( is_string( $rows ) ) {
@@ -65,6 +73,25 @@ class Admin_Trainers {
 		Repo::replace_hours( $id, $rows );
 		Notice::add( 'success', __( 'Trainer saved.', 'fwh-speaking-booking' ) );
 		Notice::redirect( self::PAGE, array( 'action' => 'edit', 'trainer' => $id ) );
+	}
+
+	public function handle_delete(): void {
+		$this->guard( 'fwh_sb_delete_trainer' );
+		$id      = isset( $_POST['trainer_id'] ) ? absint( $_POST['trainer_id'] ) : 0;
+		$trainer = $id ? Repo::trainer( $id ) : null;
+		if ( ! $trainer ) {
+			Notice::add( 'error', __( 'Trainer not found.', 'fwh-speaking-booking' ) );
+			Notice::redirect( self::PAGE );
+		}
+		$kept = Repo::trainer_booking_count( $id );
+		if ( $kept > 0 ) {
+			Notice::add( 'error', sprintf( /* translators: 1: trainer name, 2: number of bookings */ _n( '%1$s has %2$d booking on record, so they cannot be deleted. Deactivate them instead; bookings stay in the history.', '%1$s has %2$d bookings on record, so they cannot be deleted. Deactivate them instead; bookings stay in the history.', $kept, 'fwh-speaking-booking' ), $trainer->name, $kept ) );
+			Notice::redirect( self::PAGE );
+		}
+		Repo::delete_trainer( $id );
+		$note = $trainer->user_id ? ' ' . __( 'Their WordPress login was left in place; remove it under Users if it is no longer needed.', 'fwh-speaking-booking' ) : '';
+		Notice::add( 'success', sprintf( /* translators: %s: trainer name */ __( 'Trainer %s deleted.', 'fwh-speaking-booking' ), $trainer->name ) . $note );
+		Notice::redirect( self::PAGE );
 	}
 
 	public function handle_toggle(): void {
@@ -156,7 +183,10 @@ class Admin_Trainers {
 			if ( ! $t->active ) {
 				echo '<input type="hidden" name="make_active" value="1">';
 			}
-			echo '<button class="button-link">' . ( $t->active ? esc_html__( 'Deactivate', 'fwh-speaking-booking' ) : esc_html__( 'Activate', 'fwh-speaking-booking' ) ) . '</button></form>';
+			echo '<button class="button-link">' . ( $t->active ? esc_html__( 'Deactivate', 'fwh-speaking-booking' ) : esc_html__( 'Activate', 'fwh-speaking-booking' ) ) . '</button></form> ';
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline" onsubmit="return confirm(\'' . esc_js( sprintf( /* translators: %s: trainer name */ __( 'Delete %s? Their working hours, days off and Google connection are removed. This cannot be undone.', 'fwh-speaking-booking' ), $t->name ) ) . '\')">';
+			wp_nonce_field( 'fwh_sb_delete_trainer' );
+			echo '<input type="hidden" name="action" value="fwh_sb_delete_trainer"><input type="hidden" name="trainer_id" value="' . esc_attr( (string) $t->id ) . '"><button class="button-link button-link-delete">' . esc_html__( 'Delete', 'fwh-speaking-booking' ) . '</button></form>';
 			echo '</td></tr>';
 		}
 		echo '</tbody></table>';

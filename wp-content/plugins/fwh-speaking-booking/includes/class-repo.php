@@ -60,6 +60,22 @@ class Repo {
 		$wpdb->update( Schema::table( 'trainers' ), array( 'active' => $active ? 1 : 0 ), array( 'id' => $id ), array( '%d' ), array( '%d' ) );
 	}
 
+	/** Bookings that must be kept for the record: everything except never-paid expired holds. */
+	public static function trainer_booking_count( int $id ): int {
+		global $wpdb;
+		$b = Schema::table( 'bookings' );
+		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$b} WHERE trainer_id = %d AND status <> 'expired'", $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/** Remove a trainer with their hours, days off and Google connection. Booking history is never touched. */
+	public static function delete_trainer( int $id ): void {
+		global $wpdb;
+		$wpdb->delete( Schema::table( 'trainer_hours' ), array( 'trainer_id' => $id ), array( '%d' ) );
+		$wpdb->delete( Schema::table( 'blocks' ), array( 'trainer_id' => $id ), array( '%d' ) );
+		Google_Tokens::delete( $id );
+		$wpdb->delete( Schema::table( 'trainers' ), array( 'id' => $id ), array( '%d' ) );
+	}
+
 	/** @return object[] rows with weekday, start_time, end_time. */
 	public static function hours( int $trainer_id ): array {
 		global $wpdb;

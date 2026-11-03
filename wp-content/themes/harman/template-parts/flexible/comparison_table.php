@@ -14,6 +14,17 @@ $table_2_video = $section['table_2_animated_video'] ?? '';
 $button2 = !empty($section['table_2_button']) ? $section['table_2_button'] : [];
 $tbl2lists = !empty($section['table_2_list']) && is_array($section['table_2_list']) ? $section['table_2_list'] : [];
 
+// A card is shown only when it has something in it.
+$has_list = static function ($rows) {
+  foreach ((array) $rows as $row) { if (!empty($row['text'])) { return true; } }
+  return false;
+};
+$has_card_1 = $table_1_title || $table_1_description || $table_1_icon || $table_1_video || !empty($button1['url']) || $has_list($tbl1lists);
+$has_card_2 = $table_2_title || $table_2_description || $table_2_icon || $table_2_video || !empty($button2['url']) || $has_list($tbl2lists);
+if (!$section_title && !$has_card_1 && !$has_card_2) {
+  return;
+}
+
 // Section spacing option (default keeps the original top and bottom padding).
 $space_options = ['space', 'space-top', 'space-bottom', 'no-space'];
 $space = !empty($section['space']) && in_array($section['space'], $space_options, true) ? $section['space'] : 'space';
@@ -28,7 +39,8 @@ $space = !empty($section['space']) && in_array($section['space'], $space_options
         </div>
       </div>
     <?php endif; ?>
-    <div class="row">
+    <div class="row<?php echo ($has_card_1 xor $has_card_2) ? ' is-single' : ''; ?>">
+      <?php if ($has_card_1): ?>
       <div class="col-12 col-lg-6">
         <div class="comp-table">
           <div class="comp-table-head">
@@ -69,7 +81,9 @@ $space = !empty($section['space']) && in_array($section['space'], $space_options
           <?php endif; ?>
         </div>
       </div>
+      <?php endif; ?>
 
+      <?php if ($has_card_2): ?>
       <div class="col-12 col-lg-6">
         <div class="comp-table">
           <div class="comp-table-head">
@@ -112,6 +126,7 @@ $space = !empty($section['space']) && in_array($section['space'], $space_options
           <?php endif; ?>
         </div>
       </div>
+      <?php endif; ?>
     </div>
   </div>
 </section>

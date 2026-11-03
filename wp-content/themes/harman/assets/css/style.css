@@ -275,6 +275,24 @@ ul.slimmenu li.current-menu-item a {
   width: calc(50% - 20px);
 }
 
+/* Cards in the same row share one height. */
+.comparison-table .row {
+  align-items: stretch;
+}
+.comparison-table .col-lg-6 {
+  display: flex;
+}
+.comparison-table .col-lg-6 > .comp-table {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/* A single card (the other one is empty) stays on the left, in line with the cards above. */
+.comparison-table .row.is-single {
+  justify-content: flex-start;
+}
+
 /* Stacked comparison sections with padding removed keep a small gap between card rows. */
 .comparison-table.space-top + .comparison-table.space-bottom,
 .comparison-table.space-top + .comparison-table.no-space,

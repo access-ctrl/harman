@@ -33,6 +33,8 @@ class Settings {
 			'min_notice_hours'     => 2,
 			'coordinator_email'    => '',
 			'contact_email'        => '',
+			'contact_whatsapp'     => '',
+			'duration_label'       => '',
 			'stripe_mode'          => 'test',
 			'stripe_test_pk'       => '',
 			'stripe_test_sk'       => '',
@@ -86,6 +88,19 @@ class Settings {
 		foreach ( $text as $k ) {
 			if ( isset( $input[ $k ] ) ) {
 				$out[ $k ] = sanitize_text_field( wp_unslash( $input[ $k ] ) );
+			}
+		}
+		if ( isset( $input['duration_label'] ) ) { // Text shown to students instead of "N minutes", e.g. "15-20 minutes".
+			$out['duration_label'] = mb_substr( sanitize_text_field( wp_unslash( $input['duration_label'] ) ), 0, 40 );
+		}
+		if ( isset( $input['contact_whatsapp'] ) ) {
+			$digits = preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $input['contact_whatsapp'] ) ) );
+			if ( '' === $digits ) {
+				$out['contact_whatsapp'] = '';
+			} elseif ( preg_match( '/^\d{8,15}$/', $digits ) ) {
+				$out['contact_whatsapp'] = '+' . $digits;
+			} else {
+				add_settings_error( self::OPTION, 'contact_whatsapp', __( 'Please enter the WhatsApp number with its country code, for example +14165550123.', 'fwh-speaking-booking' ) );
 			}
 		}
 		// Secrets: blank keeps the stored value; anything else must look like the right kind of key.

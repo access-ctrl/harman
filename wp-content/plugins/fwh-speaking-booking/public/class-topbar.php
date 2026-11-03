@@ -83,7 +83,7 @@ class Topbar {
 				<div class="fwh-sb-modal__head">
 					<span class="fwh-sb-modal__heading">
 						<span class="fwh-sb-modal__title" id="fwh-sb-modal-title"><?php echo esc_html( (string) Settings::get( 'session_name' ) ); ?></span>
-						<span class="fwh-sb-modal__sub"><?php echo esc_html( trim( sprintf( /* translators: %d: minutes */ __( '%d minutes', 'fwh-speaking-booking' ), (int) Settings::get( 'duration' ) ) . ( '' !== Shortcode::price_label() ? ' · ' . Shortcode::price_label() : '' ) ) ); ?></span>
+						<span class="fwh-sb-modal__sub"><?php echo esc_html( trim( Shortcode::duration_label() . ( '' !== Shortcode::price_label() ? ' · ' . Shortcode::price_label() : '' ) ) ); ?></span>
 					</span>
 					<button type="button" class="fwh-sb-modal__close" data-fwh-close aria-label="<?php esc_attr_e( 'Close', 'fwh-speaking-booking' ); ?>">&times;</button>
 				</div>

@@ -70,6 +70,16 @@ class Shortcode {
 		wp_add_inline_script( 'fwh-sb-booking', 'window.fwhSbConfig=' . wp_json_encode( self::config() ) . ';', 'before' );
 	}
 
+	/** What students read for the session length: the custom label, else "N minutes". */
+	public static function duration_label(): string {
+		$label = trim( (string) Settings::get( 'duration_label' ) );
+		if ( '' !== $label ) {
+			return $label;
+		}
+		/* translators: %d: minutes */
+		return sprintf( __( '%d minutes', 'fwh-speaking-booking' ), (int) Settings::get( 'duration' ) );
+	}
+
 	public static function config(): array {
 		$today  = new \DateTimeImmutable( 'now', Time::toronto() );
 		$window = (int) Settings::get( 'booking_window_days' );
@@ -78,6 +88,7 @@ class Shortcode {
 			'restUrl'  => esc_url_raw( rest_url( 'fwh-sb/v1/' ) ),
 			'nonce'    => wp_create_nonce( 'wp_rest' ),
 			'duration' => (int) Settings::get( 'duration' ),
+			'durationLabel' => self::duration_label(),
 			'price'    => (float) Settings::get( 'price' ),
 			'currency' => strtoupper( (string) Settings::get( 'currency' ) ),
 			'from'     => $today->format( 'Y-m-d' ),
@@ -108,7 +119,7 @@ class Shortcode {
 			<div class="fwh-sb-card">
 				<h2 class="fwh-sb-title"><?php echo esc_html( (string) Settings::get( 'session_name' ) ); ?></h2>
 				<p class="fwh-sb-meta">
-					<span><?php echo esc_html( sprintf( /* translators: %d: minutes */ __( '%d minutes', 'fwh-speaking-booking' ), (int) Settings::get( 'duration' ) ) ); ?></span>
+					<span><?php echo esc_html( self::duration_label() ); ?></span>
 					<?php if ( '' !== $label ) : ?>
 						<span><?php echo esc_html( $label ); ?></span>
 					<?php endif; ?>

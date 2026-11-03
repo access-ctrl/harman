@@ -86,6 +86,8 @@ class Admin_Settings {
 		$this->field( 'min_notice_hours', __( 'Minimum notice (hours)', 'fwh-speaking-booking' ), 'number' );
 		$this->field( 'coordinator_email', __( 'Coordinator email', 'fwh-speaking-booking' ), 'email' );
 		$this->field( 'contact_email', __( 'Student contact email', 'fwh-speaking-booking' ), 'email' );
+		$this->field( 'contact_whatsapp', __( 'Student contact WhatsApp number', 'fwh-speaking-booking' ), 'text', __( 'With country code, e.g. +14165550123. Shown in the student confirmation email.', 'fwh-speaking-booking' ) );
+		$this->field( 'duration_label', __( 'Session length shown to students', 'fwh-speaking-booking' ), 'text', __( 'e.g. 15-20 minutes. Leave blank to show the duration above. The real slot length stays as set above.', 'fwh-speaking-booking' ) );
 		echo '</table>';
 
 		echo '<h2>' . esc_html__( 'Top bar', 'fwh-speaking-booking' ) . '</h2><table class="form-table" role="presentation"><tr><th scope="row">' . esc_html__( 'Show top bar', 'fwh-speaking-booking' ) . '</th><td>';

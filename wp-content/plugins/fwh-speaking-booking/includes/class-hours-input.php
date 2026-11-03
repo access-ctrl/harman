@@ -81,17 +81,71 @@ class Hours_Input {
 		foreach ( $hours as $h ) {
 			$rows[] = array( (int) $h->weekday, substr( $h->start_time, 0, 5 ), substr( $h->end_time, 0, 5 ) );
 		}
-		foreach ( array_keys( self::DAYS ) as $day ) { // A blank row for every day Mon-Sat, so each day can be filled in.
-			$rows[] = array( $day, '', '' );
+		$used = array_unique( array_column( $rows, 0 ) );
+		foreach ( array_keys( self::DAYS ) as $day ) { // A blank row for each day that has no hours yet, so it can be filled in.
+			if ( ! in_array( $day, $used, true ) ) {
+				$rows[] = array( $day, '', '' );
+			}
 		}
-		echo '<table class="widefat" style="max-width:520px" id="fwh-sb-hours"><thead><tr><th>Day</th><th>Start</th><th>End</th></tr></thead><tbody>';
+
+		echo '<p class="fwh-sb-samehours"><label><input type="checkbox" id="fwh-sb-same"> ' . esc_html__( 'Use the first row\'s start and end time for every day', 'fwh-speaking-booking' ) . '</label></p>';
+		echo '<table class="widefat" style="max-width:620px" id="fwh-sb-hours"><thead><tr><th>Day</th><th>Start</th><th>End</th><th></th></tr></thead><tbody>';
 		foreach ( $rows as $r ) {
 			echo '<tr><td><select name="hours_day[]">';
 			foreach ( self::DAYS as $num => $label ) {
 				printf( '<option value="%d" %s>%s</option>', (int) $num, selected( $r[0], $num, false ), esc_html( $label ) );
 			}
-			printf( '</select></td><td><input type="time" name="hours_start[]" value="%s"></td><td><input type="time" name="hours_end[]" value="%s"></td></tr>', esc_attr( $r[1] ), esc_attr( $r[2] ) );
+			printf( '</select></td><td><input type="time" name="hours_start[]" value="%s"></td><td><input type="time" name="hours_end[]" value="%s"></td><td><button type="button" class="button-link button-link-delete fwh-sb-rm" aria-label="%s">%s</button></td></tr>', esc_attr( $r[1] ), esc_attr( $r[2] ), esc_attr__( 'Remove this time range', 'fwh-speaking-booking' ), esc_html__( 'Remove', 'fwh-speaking-booking' ) );
 		}
 		echo '</tbody></table>';
+		echo '<p><button type="button" class="button-link" id="fwh-sb-addrow">+ ' . esc_html__( 'Add another range', 'fwh-speaking-booking' ) . '</button></p>';
+		?>
+<script>
+(function () {
+	var tbl = document.getElementById('fwh-sb-hours');
+	var same = document.getElementById('fwh-sb-same');
+	var add = document.getElementById('fwh-sb-addrow');
+	if (!tbl || !same || !add) { return; }
+	var body = tbl.tBodies[0];
+	function rows() { return Array.prototype.slice.call(body.rows); }
+	function times(r) { return r.querySelectorAll('input[type="time"]'); }
+	// Copy the first row's times onto the first row of every other day. Extra ranges on a day are left as they are.
+	function apply() {
+		if (!same.checked) { return; }
+		var all = rows(), f = times(all[0]), seen = {};
+		seen[all[0].querySelector('select').value] = true;
+		all.slice(1).forEach(function (r) {
+			var day = r.querySelector('select').value;
+			if (seen[day]) { return; }
+			seen[day] = true;
+			var t = times(r);
+			t[0].value = f[0].value;
+			t[1].value = f[1].value;
+		});
+	}
+	same.addEventListener('change', apply);
+	body.addEventListener('input', function (e) { if (same.checked && rows()[0].contains(e.target)) { apply(); } });
+	// Remove: an extra range on a day is deleted; the only row for a day is cleared so that day is off (and can be filled again).
+	body.addEventListener('click', function (e) {
+		var btn = e.target.closest ? e.target.closest('.fwh-sb-rm') : null;
+		if (!btn) { return; }
+		var tr = btn.closest('tr'), day = tr.querySelector('select').value;
+		var sameDay = rows().filter(function (r) { return r.querySelector('select').value === day; });
+		if (sameDay.length > 1) {
+			tr.parentNode.removeChild(tr);
+		} else {
+			Array.prototype.forEach.call(times(tr), function (i) { i.value = ''; });
+		}
+		same.checked = false; // The days are no longer all the same, so stop syncing them.
+	});
+	add.addEventListener('click', function () {
+		var clone = rows()[rows().length - 1].cloneNode(true);
+		Array.prototype.forEach.call(clone.querySelectorAll('input'), function (i) { i.value = ''; });
+		clone.querySelector('select').value = '1';
+		body.appendChild(clone);
+	});
+})();
+</script>
+		<?php
 	}
 }

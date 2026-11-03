@@ -51,7 +51,9 @@ class Mailer {
 				'when'     => $local->format( 'l, j F Y \a\t g:i A' ),
 				'zone'     => $zone->getName() . ' (' . $local->format( 'T' ) . ')',
 				'duration' => (int) Settings::get( 'duration' ),
+				'duration_label' => Shortcode::duration_label(),
 				'contact'  => $contact,
+				'whatsapp' => (string) Settings::get( 'contact_whatsapp' ),
 			)
 		);
 		if ( ! wp_mail( $b->student_email, 'Your French speaking session is confirmed (' . $b->ref . ')', $html, $headers ) ) {

@@ -167,7 +167,10 @@
 		els.cal = el('div', { 'class': 'fwh-sb-cal' });
 		els.slots = el('div', { 'class': 'fwh-sb-slots' });
 		els.form = el('div', { 'class': 'fwh-sb-form' });
-		[els.status, els.cal, els.slots, els.form].forEach(function (n) { body.appendChild(n); });
+		// Calendar and times sit side by side on wide screens so a day and its times are visible together.
+		els.pick = el('div', { 'class': 'fwh-sb-pick' });
+		els.pick.appendChild(els.cal); els.pick.appendChild(els.slots);
+		[els.status, els.pick, els.form].forEach(function (n) { body.appendChild(n); });
 	}
 
 	function showLoading(msg) {
@@ -244,6 +247,7 @@
 		if (!state.monthKey || months.indexOf(state.monthKey) === -1) { state.monthKey = months[0]; }
 		renderCalendar(map, months);
 		if (state.day && map[state.day]) { renderSlots(map[state.day]); }
+		else { els.slots.appendChild(el('p', { 'class': 'fwh-sb-placeholder' }, 'Pick a day to see the available times.')); }
 		if (state.slot) { renderForm(); }
 		finishRender();
 	}
@@ -323,18 +327,49 @@
 
 	function renderSlots(list) {
 		els.slots.appendChild(el('h3', null, 'Available times'));
-		var parts = [cfg.duration + ' minutes'];
+		var parts = [cfg.durationLabel || (cfg.duration + ' minutes')];
 		if (money()) { parts.push(money()); }
 		parts.push('times shown in ' + ((cfg.tzLabels && cfg.tzLabels[state.tz]) || state.tz.replace(/_/g, ' ')));
 		els.slots.appendChild(el('p', { 'class': 'fwh-sb-note' }, parts.join(' · ')));
-		var wrap = el('div', { 'class': 'fwh-sb-slotlist', role: 'group', 'aria-label': 'Available times' });
-		list.forEach(function (iso, idx) {
+		// Group long lists into Morning / Afternoon / Evening so a time is quick to find.
+		var groups = [];
+		list.forEach(function (iso) {
+			var name = dayPart(iso, state.tz), g = groups[groups.length - 1];
+			if (!g || g.name !== name) { g = { name: name, items: [] }; groups.push(g); }
+			g.items.push(iso);
+		});
+		var showHeads = list.length > 6 && groups.length > 1;
+		var idx = 0;
+		var all = el('div', { 'class': 'fwh-sb-slotgroups', role: 'group', 'aria-label': 'Available times' });
+		groups.forEach(function (g) {
+			var box = el('div', { 'class': 'fwh-sb-slotgroup' });
+			if (showHeads) { box.appendChild(el('h4', null, g.name)); }
+			var wrap = el('div', { 'class': 'fwh-sb-slotlist' });
+			g.items.forEach(function (iso) {
 			var b = el('button', { type: 'button', 'class': 'fwh-sb-slot' + (iso === state.slot ? ' is-selected' : ''), 'aria-pressed': iso === state.slot ? 'true' : 'false' }, timeLabel(iso, state.tz));
-			b.style.setProperty('--i', String(Math.min(idx, 12)));
+			b.style.setProperty('--i', String(Math.min(idx++, 12)));
 			b.addEventListener('click', function () { state.slot = iso; state.enter = { form: true }; state.pop = true; render(); var f = els.form.querySelector('input'); if (f) { f.focus({ preventScroll: true }); } nudge(els.form); });
 			wrap.appendChild(b);
+			});
+			box.appendChild(wrap); all.appendChild(box);
 		});
-		els.slots.appendChild(wrap);
+		// Arrow keys move between times.
+		all.addEventListener('keydown', function (ev) {
+			var step = (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') ? 1 : (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') ? -1 : 0;
+			if (!step) { return; }
+			var btns = Array.prototype.slice.call(all.querySelectorAll('.fwh-sb-slot'));
+			var at = btns.indexOf(document.activeElement);
+			if (at === -1) { return; }
+			ev.preventDefault();
+			var next = btns[at + step];
+			if (next) { next.focus(); }
+		});
+		els.slots.appendChild(all);
+	}
+
+	function dayPart(iso, tz) {
+		var h = parseInt(fmt('H', tz, { hour: 'numeric', hourCycle: 'h23' }).format(new Date(iso)), 10);
+		return h < 12 ? 'Morning' : (h < 17 ? 'Afternoon' : 'Evening');
 	}
 
 	function field(id, label, type, extra, hint) {
@@ -349,7 +384,7 @@
 
 	function renderForm() {
 		els.form.appendChild(el('h3', null, 'Your details'));
-		els.form.appendChild(el('p', { 'class': 'fwh-sb-summary' }, longLabel(state.slot, state.tz) + ' (' + state.tz.replace(/_/g, ' ') + ') \u00B7 ' + cfg.duration + ' min' + (money() ? ' \u00B7 ' + money() : '')));
+		els.form.appendChild(el('p', { 'class': 'fwh-sb-summary' }, longLabel(state.slot, state.tz) + ' (' + state.tz.replace(/_/g, ' ') + ') \u00B7 ' + (cfg.durationLabel || (cfg.duration + ' min')) + (money() ? ' \u00B7 ' + money() : '')));
 		var form = el('form', { novalidate: 'novalidate' });
 		form.appendChild(field('fwh-sb-name', 'Full name', 'text', { autocomplete: 'name', maxlength: '190' }));
 		form.appendChild(field('fwh-sb-email', 'Email', 'email', { autocomplete: 'email', maxlength: '190' }));
