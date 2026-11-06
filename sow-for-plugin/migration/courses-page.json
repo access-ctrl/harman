@@ -1,0 +1,229 @@
+{
+    "_about": "Courses page content exported from staging (harman.lngc.ltd). Images are listed by file name; the import script finds them in the theme folder assets/images/cards/ and adds them to the Media Library.",
+    "exported": "2026-11-06T13:05:40+00:00",
+    "post": {
+        "post_title": "Courses",
+        "post_name": "courses",
+        "post_status": "publish",
+        "post_type": "page",
+        "post_content": ""
+    },
+    "acf_field_key": "field_68021e2777e7f",
+    "acf_field_name": "page_section",
+    "sections": [
+        {
+            "acf_fc_layout": "comparison_table",
+            "section_title": "<strong>Choose According</strong> to Your Goal",
+            "table_1_title": "<strong>French for</strong> Canada PR",
+            "table_1_description": "Interactive lessons, personalized guidance, and cultural immersion.",
+            "table_1_button": {
+                "title": "Enroll now",
+                "url": "https://www.paypal.com/ncp/payment/QWDDS7GEUTMWW",
+                "target": ""
+            },
+            "table_1_icon": {
+                "file": "french-for-canada-pr.svg"
+            },
+            "table_1_animated_video": {
+                "file": ""
+            },
+            "table_1_list": [
+                {
+                    "text": "4 levels of French Language learning- 100 hours of content"
+                },
+                {
+                    "text": "A1+A2- 52 hours"
+                },
+                {
+                    "text": "B1+ B2- 48 hours"
+                },
+                {
+                    "text": "TEF- 120 Hours"
+                },
+                {
+                    "text": "Access to all the lessons on the portal"
+                },
+                {
+                    "text": "Valid for one year"
+                },
+                {
+                    "text": "8 slots of live sessions in a day ( you can join any time)"
+                },
+                {
+                    "text": "Practice tests"
+                },
+                {
+                    "text": "Assignments"
+                },
+                {
+                    "text": "Mock tests"
+                },
+                {
+                    "text": "Speaking practice"
+                },
+                {
+                    "text": "Writing feedback"
+                },
+                {
+                    "text": "Reading tips and discussions"
+                },
+                {
+                    "text": "Listening tips and discussion"
+                }
+            ],
+            "table_2_title": "<strong>French for</strong> Career",
+            "table_2_description": "Interactive lessons, personalized guidance, and cultural immersion.",
+            "table_2_button": {
+                "title": "Enroll now",
+                "url": "https://www.paypal.com/ncp/payment/572SY6SLB8M6A",
+                "target": ""
+            },
+            "table_2_icon": {
+                "file": "french-for-career.svg"
+            },
+            "table_2_animated_video": {
+                "file": ""
+            },
+            "table_2_list": [
+                {
+                    "text": "4 levels of French"
+                },
+                {
+                    "text": "Beginner- A1, A2 120 hours"
+                },
+                {
+                    "text": "Intermediate- B1, B2 78 hours"
+                },
+                {
+                    "text": "Access to all the lessons on the portal"
+                },
+                {
+                    "text": "Valid for one year"
+                },
+                {
+                    "text": "8 slots of live sessions in a day (you can join any slot)"
+                },
+                {
+                    "text": "Practice tests"
+                },
+                {
+                    "text": "Assignments"
+                },
+                {
+                    "text": "Mock tests"
+                },
+                {
+                    "text": "Speaking practice"
+                },
+                {
+                    "text": "Writing feedback"
+                },
+                {
+                    "text": "Reading tips and discussions"
+                },
+                {
+                    "text": "Listening tips and discussion"
+                },
+                {
+                    "text": "DELF EXAM preparation of all the levels (A1, A2, B1, B2)"
+                }
+            ],
+            "space": "space"
+        },
+        {
+            "acf_fc_layout": "comparison_table",
+            "section_title": "",
+            "table_1_title": "<strong>One to One Speaking</strong>",
+            "table_1_description": "15–20 minutes of personalized speaking practice with expert guidance. Build confidence, improve your pronunciation, and develop real-world French communication skills. <strong>179 CAD</strong>",
+            "table_1_button": {
+                "title": "Enroll now",
+                "url": "#fwh-book",
+                "target": ""
+            },
+            "table_1_icon": {
+                "file": "one-to-one-speaking.svg"
+            },
+            "table_1_animated_video": {
+                "file": ""
+            },
+            "table_1_list": false,
+            "table_2_title": "<strong>One-to-One & Group Speaking </strong>",
+            "table_2_description": "Combine personalized 15–20 minute one-to-one speaking sessions with interactive group conversations. Improve your fluency, pronunciation, and confidence through real-life French practice. <strong>250 CAD / Month</strong>",
+            "table_2_button": {
+                "title": "Enroll now",
+                "url": "https://www.paypal.com/ncp/payment/ME2T7XSHCHX22",
+                "target": ""
+            },
+            "table_2_icon": {
+                "file": "one-to-one-and-group.svg"
+            },
+            "table_2_animated_video": {
+                "file": ""
+            },
+            "table_2_list": false,
+            "space": "space-bottom"
+        },
+        {
+            "acf_fc_layout": "comparison_table",
+            "section_title": "",
+            "table_1_title": "<strong>Group Writing Feedback & Discussion</strong>",
+            "table_1_description": "Improve your French writing skills through personalized group feedback and interactive discussions. Receive guidance on grammar, vocabulary, and sentence structure while learning to express your ideas with confidence. <strong>199 CAD / Month</strong>",
+            "table_1_button": {
+                "title": "Enroll now",
+                "url": "https://www.paypal.com/ncp/payment/LWFNCJU324YXW",
+                "target": ""
+            },
+            "table_1_icon": {
+                "file": "group-writing-feedback.svg"
+            },
+            "table_1_animated_video": {
+                "file": ""
+            },
+            "table_1_list": false,
+            "table_2_title": "<strong> French Communication Package </strong>",
+            "table_2_description": "Get the best of both worlds with one-to-one speaking sessions (15–20 minutes), interactive group speaking practice, and group writing feedback and discussions. Strengthen your fluency, improve your writing, and build confidence in everyday French communication.<strong>308 CAD / Month</strong>",
+            "table_2_button": {
+                "title": "Enroll now",
+                "url": "https://www.paypal.com/ncp/payment/HZLNFHB2XR7SA",
+                "target": ""
+            },
+            "table_2_icon": {
+                "file": "complete-package.svg"
+            },
+            "table_2_animated_video": {
+                "file": ""
+            },
+            "table_2_list": false,
+            "space": "space-bottom"
+        },
+        {
+            "acf_fc_layout": "comparison_table",
+            "section_title": "",
+            "table_1_title": "<strong>French Excellence Package</strong>",
+            "table_1_description": "Master every aspect of French with one-to-one speaking sessions (15–20 minutes), interactive group speaking, group writing feedback and discussions, plus dedicated reading and listening preparation. Build fluency, strengthen comprehension, and communicate with confidence. <strong>408 CAD / Month </strong>",
+            "table_1_button": {
+                "title": "Enroll now",
+                "url": "https://www.paypal.com/ncp/payment/LWFNCJU324YXW",
+                "target": ""
+            },
+            "table_1_icon": {
+                "file": "french-excellence-package.svg"
+            },
+            "table_1_animated_video": {
+                "file": ""
+            },
+            "table_1_list": false,
+            "table_2_title": "",
+            "table_2_description": "",
+            "table_2_button": "",
+            "table_2_icon": {
+                "file": ""
+            },
+            "table_2_animated_video": {
+                "file": ""
+            },
+            "table_2_list": false,
+            "space": "space-bottom"
+        }
+    ]
+}
