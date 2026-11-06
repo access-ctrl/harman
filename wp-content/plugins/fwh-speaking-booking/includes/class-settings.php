@@ -94,8 +94,9 @@ class Settings {
 			$out['duration_label'] = mb_substr( sanitize_text_field( wp_unslash( $input['duration_label'] ) ), 0, 40 );
 		}
 		if ( isset( $input['contact_whatsapp'] ) ) {
-			$digits = preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $input['contact_whatsapp'] ) ) );
-			if ( '' === $digits ) {
+			$raw_wa = trim( sanitize_text_field( wp_unslash( $input['contact_whatsapp'] ) ) );
+			$digits = preg_replace( '/\D/', '', $raw_wa );
+			if ( '' === $raw_wa ) {
 				$out['contact_whatsapp'] = '';
 			} elseif ( preg_match( '/^\d{8,15}$/', $digits ) ) {
 				$out['contact_whatsapp'] = '+' . $digits;
@@ -153,9 +154,11 @@ class Settings {
 		}
 		foreach ( array( 'coordinator_email', 'contact_email' ) as $k ) {
 			if ( isset( $input[ $k ] ) ) {
-				$email = sanitize_email( wp_unslash( $input[ $k ] ) );
-				if ( '' !== $email && ! is_email( $email ) ) {
-					add_settings_error( self::OPTION, $k, __( 'Please enter a valid email address.', 'fwh-speaking-booking' ) );
+				// sanitize_email() turns an invalid address into '', so judge the raw text or a typo would silently blank the saved address.
+				$raw   = trim( sanitize_text_field( wp_unslash( $input[ $k ] ) ) );
+				$email = sanitize_email( $raw );
+				if ( '' !== $raw && ( '' === $email || ! is_email( $email ) ) ) {
+					add_settings_error( self::OPTION, $k, __( 'Please enter a valid email address. The previous address was kept.', 'fwh-speaking-booking' ) );
 				} else {
 					$out[ $k ] = $email;
 				}
